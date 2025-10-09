@@ -1,0 +1,85 @@
+@startuml
+
+class Student {
+    - studentId : int
+    - name : string
+    - email : string
+    - password : string
+    - roomNo : string
+    - totalRebate : float
+    + login()
+    + viewMeals()
+    + optOutMeal(mealId : int)
+    + submitReview(mealId : int, comment : string, rating : int)
+    + viewRebate()
+    + receiveNotification(notification : Notification)
+}
+
+class Meal {
+    - mealId : int
+    - date : Date
+    - mealType : string
+    - menu : string
+    + getMealDetails()
+}
+
+class OptOut {
+    - optOutId : int
+    - studentId : int
+    - mealId : int
+    - timestamp : DateTime
+    + recordOptOut()
+}
+
+class Review {
+    - reviewId : int
+    - studentId : int
+    - mealId : int
+    - rating : int
+    - comment : string
+    - sentimentScore : float
+    - timestamp : DateTime
+    + analyzeSentiment()
+}
+
+class Admin {
+    - adminId : int
+    - name : string
+    - email : string
+    - password : string
+    + login()
+    + approveRebate(optOutId : int)
+    + manageAttendance()
+    + manageSpecialDinner(dinnerId : int)
+    + viewReports()
+    + monitorFoodWastage()
+    + sendNotification(notification : Notification)
+}
+
+class SpecialDinner {
+    - dinnerId : int
+    - date : Date
+    - menu : string
+    - capacity : int
+    + getDinnerDetails()
+}
+
+class Notification {
+    - notificationId : int
+    - userId : int
+    - type : string
+    - message : string
+    - timestamp : DateTime
+    + send()
+}
+
+Student "1" -- "*" OptOut : opts_out
+Meal "1" -- "*" OptOut : skipped_in
+Student "1" -- "*" Review : submits
+Meal "1" -- "*" Review : reviewed
+Admin "1" -- "*" SpecialDinner : manages
+Student "1" -- "*" SpecialDinner : attends
+Admin "1" -- "*" Notification : sends
+Student "1" -- "*" Notification : receives
+
+@enduml

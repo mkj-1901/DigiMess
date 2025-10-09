@@ -8,14 +8,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => console.log('✅ MongoDB connected'))
 .catch((err) => {
-  console.error('❌ MongoDB connection error:', err.message);
+  console.error(' MongoDB connection error:', err.message);
   process.exit(1); // stop server if DB not connected
 });
 
@@ -39,5 +39,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

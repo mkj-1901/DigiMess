@@ -1,0 +1,45 @@
+@startuml
+actor Student
+actor Admin
+participant "DigiMess System" as System
+database "Database" as DB
+participant "ML Service\n(Sentiment Analysis)" as ML
+
+Student -> System : Login
+System -> DB : Validate credentials
+DB --> System : Auth success
+System --> Student : Dashboard displayed
+
+Student -> System : Opt-out of meal
+System -> DB : Store opt-out request
+DB --> System : Confirmation
+System --> Student : Opt-out confirmed
+
+Student -> System : Submit review
+System -> DB : Save review
+System -> ML : Send review for sentiment analysis
+ML --> System : Sentiment result
+System -> DB : Store sentiment score
+System --> Student : Review submitted
+
+Admin -> System : Login
+System -> DB : Validate credentials
+DB --> System : Auth success
+System --> Admin : Admin Dashboard displayed
+
+Admin -> System : View opt-out requests
+System -> DB : Fetch opt-out data
+DB --> System : Return opt-out list
+System --> Admin : Show requests
+
+Admin -> System : Calculate rebates
+System -> DB : Update rebate records
+DB --> System : Confirmation
+System --> Admin : Rebate summary generated
+
+Admin -> System : View sentiment analysis
+System -> DB : Fetch aggregated review data
+DB --> System : Return sentiment results
+System --> Admin : Display analytics report
+
+@enduml

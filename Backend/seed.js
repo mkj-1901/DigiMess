@@ -11,7 +11,7 @@ async function seedUsers() {
     // Seed Admin
     const existingAdmin = await User.findOne({ email: 'admin@digimess.com' });
     if (existingAdmin) {
-      console.log('🔄 Admin user already exists, updating password...');
+      console.log(' Admin user already exists, updating password...');
       existingAdmin.password = 'admin123'; // plain text (will be re-hashed)
       await existingAdmin.save();
     } else {
@@ -21,13 +21,13 @@ async function seedUsers() {
         password: 'admin123', // plain text (will be hashed automatically)
         role: 'admin'
       });
-      console.log('✅ Admin user created successfully');
+      console.log('Admin user created successfully');
     }
 
     // Seed Student
     const existingStudent = await User.findOne({ email: 'student@digimess.com' });
     if (existingStudent) {
-      console.log('🔄 Student user already exists, updating password...');
+      console.log(' Student user already exists, updating password...');
       existingStudent.password = 'student123'; // plain text (will be re-hashed)
       await existingStudent.save();
     } else {
@@ -37,13 +37,13 @@ async function seedUsers() {
         password: 'student123', // plain text (will be hashed automatically)
         role: 'student'
       });
-      console.log('✅ Student user created successfully');
+      console.log(' Student user created successfully');
     }
 
-    console.log('✅ All users seeded successfully');
+    console.log(' All users seeded successfully');
     process.exit(0);
   } catch (err) {
-    console.error('❌ Error seeding users:', err.message);
+    console.error(' Error seeding users:', err.message);
     process.exit(1);
   }
 }

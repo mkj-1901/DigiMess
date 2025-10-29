@@ -25,7 +25,19 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth');
+const mealsRoutes = require('./routes/meals');
+const optoutRoutes = require('./routes/optout');
+const rebateRoutes = require('./routes/rebate');
+const reviewsRoutes = require('./routes/reviews');
+const adminRoutes = require('./routes/admin');
+const { verifyToken, roleCheck } = require('./middleware/authMiddleware');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/meals', verifyToken, mealsRoutes);
+app.use('/api/optout', verifyToken, optoutRoutes);
+app.use('/api/rebate', verifyToken, rebateRoutes);
+app.use('/api/reviews', verifyToken, reviewsRoutes);
+app.use('/api/admin', verifyToken, roleCheck(['admin']), adminRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

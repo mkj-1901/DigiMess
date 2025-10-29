@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/authService";
 import type { LoginCredentials } from "../types/User";
 
-interface LoginPageProps {
+interface StudentLoginPageProps {
   onLogin: (user: any) => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,9 +50,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-extrabold text-gray-900">
-            Welcome to DigiMess
+            Student Login to DigiMess
           </h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
+          <p className="mt-2 text-sm text-gray-600">Sign in to your student account</p>
         </div>
 
         {/* Form */}
@@ -59,31 +60,30 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           <div className="space-y-4">
             {/* Email */}
             <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            placeholder="Email address"
-            value={credentials.email}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                      placeholder-gray-400 text-gray-900 focus:outline-none 
-                      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="Email address"
+              value={credentials.email}
+              onChange={handleInputChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
+                        placeholder-gray-400 text-gray-900 focus:outline-none 
+                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
 
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            placeholder="Password"
-            value={credentials.password}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                      placeholder-gray-400 text-gray-900 focus:outline-none 
-                      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              placeholder="Password"
+              value={credentials.password}
+              onChange={handleInputChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
+                        placeholder-gray-400 text-gray-900 focus:outline-none 
+                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
           </div>
 
           {/* Error */}
@@ -112,18 +112,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             <p className="text-xs text-gray-500">
               Demo credentials:
               <br />
-              Admin: <b>admin@digimess.com</b> / <b>admin123</b>
-              <br />
               Student: <b>student@digimess.com</b> / <b>student123</b>
             </p>
           </div>
 
-          {/* Student Signup Link */}
+          {/* Signup Link */}
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
-              New student?{" "}
+              Don't have an account?{" "}
               <Link to="/student/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Create an account
+                Sign up
               </Link>
             </p>
           </div>

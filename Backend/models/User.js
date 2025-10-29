@@ -5,7 +5,23 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'student'], default: 'student' }
+  role: { type: String, enum: ['admin', 'student'], default: 'student' },
+  attendanceHistory: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MealAttendance'
+  }],
+  optOuts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'OptOut'
+  }],
+  rebates: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Rebate'
+  }],
+  reviews: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
+  }]
 });
 
 // Hash password before saving

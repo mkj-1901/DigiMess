@@ -1,0 +1,44 @@
+@startuml
+|Student|
+start
+
+:Login;
+:View Dashboard;
+
+partition "Student Actions" {
+    if ("Opt-out of meal?") then (Yes)
+        :Submit opt-out request;
+        -> Admin;
+    else (No)
+        :Proceed with meal;
+    endif
+
+    if ("Submit review?") then (Yes)
+        :Write and submit review;
+        :System performs sentiment analysis;
+        -> Admin;
+    else (No)
+        :Skip review;
+    endif
+
+    :Check rebate summary;
+}
+
+|Admin|
+partition "Admin Actions" {
+    :Login to Admin Panel;
+    :View opt-out requests;
+    :Calculate rebates;
+    :View sentiment analysis of reviews;
+
+    if ("Special dinner planned?") then (Yes)
+        :Update menu and notify students;
+    else (No)
+        :Continue with regular meals;
+    endif
+
+    :Generate reports (attendance, wastage, rebates);
+}
+
+stop
+@enduml

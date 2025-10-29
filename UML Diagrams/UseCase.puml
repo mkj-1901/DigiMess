@@ -1,0 +1,51 @@
+@startuml
+!define RECTANGLE class
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor Student
+actor Admin
+
+rectangle "DigiMess System" {
+
+    usecase "Login / Authentication" as UC_Login
+    usecase "View Meals" as UC_ViewMeals
+    usecase "Opt-Out Meal" as UC_OptOut
+    usecase "Submit Meal Review" as UC_Review
+    usecase "View Rebate" as UC_ViewRebate
+    usecase "Receive Notification" as UC_Notification
+
+    usecase "Manage Attendance" as UC_ManageAttendance
+    usecase "Approve Rebates" as UC_ApproveRebate
+    usecase "Manage Special Dinners" as UC_ManageDinner
+    usecase "View Reports & Analytics" as UC_Reports
+    usecase "Monitor Food Wastage" as UC_FoodWastage
+    usecase "Analyze Sentiment" as UC_Sentiment
+
+}
+
+Student --> UC_Login
+Student --> UC_ViewMeals
+Student --> UC_OptOut
+Student --> UC_Review
+Student --> UC_ViewRebate
+Student --> UC_Notification
+
+Admin --> UC_Login
+Admin --> UC_ManageAttendance
+Admin --> UC_ApproveRebate
+Admin --> UC_ManageDinner
+Admin --> UC_Reports
+Admin --> UC_FoodWastage
+Admin --> UC_Sentiment
+
+UC_OptOut ..> UC_ViewMeals : <<include>>
+UC_ApproveRebate ..> UC_ManageAttendance : <<include>>
+UC_Sentiment ..> UC_Review : <<include>>
+
+UC_Notification ..> UC_OptOut : <<extend>>
+UC_Notification ..> UC_ApproveRebate : <<extend>>
+UC_Notification ..> UC_ManageDinner : <<extend>>
+
+@enduml

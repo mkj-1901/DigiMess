@@ -44,52 +44,67 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen w-screen flex items-center justify-center animate-fade-in">
+      <div className="w-full max-w-md card p-8 animate-slide-in">
         {/* Header */}
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-extrabold text-gray-900">
+        <div className="text-center mb-8">
+          <div className="mb-4">
+            <svg className="mx-auto h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome to DigiMess
           </h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
+          <p className="text-gray-600">Sign in to your account</p>
         </div>
 
         {/* Form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {/* Email */}
-            <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            placeholder="Email address"
-            value={credentials.email}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                      placeholder-gray-400 text-gray-900 focus:outline-none 
-                      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="Enter your email"
+                value={credentials.email}
+                onChange={handleInputChange}
+                className="form-input"
+              />
+            </div>
 
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            placeholder="Password"
-            value={credentials.password}
-            onChange={handleInputChange}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                      placeholder-gray-400 text-gray-900 focus:outline-none 
-                      focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="Enter your password"
+                value={credentials.password}
+                onChange={handleInputChange}
+                className="form-input"
+              />
+            </div>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-center">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="error-message">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {error}
+              </div>
             </div>
           )}
 
@@ -98,31 +113,38 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-64 py-3 px-6 text-sm font-medium rounded-md text-white 
-                         bg-indigo-600 hover:bg-indigo-700 focus:outline-none 
-                         focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 
-                         disabled:opacity-50 transition-colors duration-200"
+              className="btn-primary w-full flex items-center justify-center"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? (
+                <>
+                  <div className="spinner mr-2"></div>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Sign in
+                </>
+              )}
             </button>
           </div>
 
           {/* Demo Credentials */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              Demo credentials:
-              <br />
-              Admin: <b>admin@digimess.com</b> / <b>admin123</b>
-              <br />
-              Student: <b>student@digimess.com</b> / <b>student123</b>
-            </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
+            <div className="text-xs text-blue-800 space-y-1">
+              <div><strong>Admin:</strong> admin@digimess.com / admin123</div>
+              <div><strong>Student:</strong> student@digimess.com / student123</div>
+            </div>
           </div>
 
           {/* Student Signup Link */}
-          <div className="text-center mt-4">
+          <div className="text-center">
             <p className="text-sm text-gray-600">
               New student?{" "}
-              <Link to="/student/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link to="/student/signup" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                 Create an account
               </Link>
             </p>

@@ -98,10 +98,7 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
             <button
               type="submit"
               disabled={loading}
-              className="w-64 py-3 px-6 text-sm font-medium rounded-md text-white 
-                         bg-indigo-600 hover:bg-indigo-700 focus:outline-none 
-                         focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 
-                         disabled:opacity-50 transition-colors duration-200"
+              className="btn-primary w-64 py-3 px-6 text-sm font-medium"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>

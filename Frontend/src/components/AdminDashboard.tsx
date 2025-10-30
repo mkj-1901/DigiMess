@@ -84,99 +84,127 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      <div className="dashboard-bg loading-container">
+        <div className="loading-spinner"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow">
+    <div className="dashboard-bg min-h-screen">
+      <nav className="nav">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold">DigiMess Admin Dashboard</h1>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+                  <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h1 className="text-xl font-bold text-gray-900">DigiMess Admin Dashboard</h1>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">Welcome, {user.name}</span>
+              <div className="flex items-center space-x-2 bg-white/50 px-3 py-1 rounded-full">
+                <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="text-sm font-medium text-gray-700">Welcome, {user.name}</span>
+              </div>
               <button
                 onClick={onLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-600"
+                className="btn-danger flex items-center space-x-2 hover:scale-105 transition-transform"
               >
-                Logout
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Logout</span>
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Admin Panel</h2>
-            <p className="text-gray-600">
-              Manage mess operations, view reports, and handle approvals.
-            </p>
+      <main className="py-8 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-0">
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-8 border border-gray-100">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Admin Control Center</h2>
+              <p className="text-gray-600 text-lg">
+                Oversee mess operations, monitor performance, and manage approvals with ease.
+              </p>
+            </div>
 
             {error && (
-              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error}
+              <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-r-lg">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {error}
+                </div>
               </div>
             )}
 
-            {/* Stats */}
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-blue-500 rounded"></div>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
+              <div className="card p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                      </svg>
                     </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
-                          Total Users
-                        </dt>
-                        <dd className="text-lg font-medium text-gray-900">{stats.totalUsers}</dd>
-                      </dl>
-                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Total Users
+                      </dt>
+                      <dd className="text-3xl font-bold text-gray-900">{stats.totalUsers}</dd>
+                    </dl>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-green-500 rounded"></div>
+              <div className="card p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
-                          Active Today
-                        </dt>
-                        <dd className="text-lg font-medium text-gray-900">{stats.activeToday}</dd>
-                      </dl>
-                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Active Today
+                      </dt>
+                      <dd className="text-3xl font-bold text-gray-900">{stats.activeToday}</dd>
+                    </dl>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-yellow-500 rounded"></div>
+              <div className="card p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
-                          Pending Requests
-                        </dt>
-                        <dd className="text-lg font-medium text-gray-900">{stats.pendingRequests}</dd>
-                      </dl>
-                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Pending Requests
+                      </dt>
+                      <dd className="text-3xl font-bold text-gray-900">{stats.pendingRequests}</dd>
+                    </dl>
                   </div>
                 </div>
               </div>
@@ -229,13 +257,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
                             onClick={() => handleApproveOptOut(opt._id, true)}
-                            className="bg-green-600 text-white px-2 py-1 rounded mr-2 hover:bg-green-700"
+                            className="btn-success mr-2"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleApproveOptOut(opt._id, false)}
-                            className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                            className="btn-danger"
                           >
                             Reject
                           </button>
@@ -269,13 +297,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
                             onClick={() => handleApproveRebate(reb._id, 'approved')}
-                            className="bg-green-600 text-white px-2 py-1 rounded mr-2 hover:bg-green-700"
+                            className="btn-success mr-2"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleApproveRebate(reb._id, 'rejected')}
-                            className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                            className="btn-danger"
                           >
                             Reject
                           </button>
@@ -311,13 +339,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ user, onLogout }
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
                             onClick={() => handleApproveReview(rev._id, true)}
-                            className="bg-green-600 text-white px-2 py-1 rounded mr-2 hover:bg-green-700"
+                            className="btn-success mr-2"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleApproveReview(rev._id, false)}
-                            className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                            className="btn-danger"
                           >
                             Reject
                           </button>

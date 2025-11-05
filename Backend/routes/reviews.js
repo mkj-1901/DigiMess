@@ -1,6 +1,7 @@
 const express = require('express');
 const Review = require('../models/Review');
 const { verifyToken, roleCheck } = require('../middleware/authMiddleware');
+const { summarizeReviews } = require('../ml/summarizer');
 
 const router = express.Router();
 
@@ -91,6 +92,41 @@ router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) =
     res.json({ success: true, review });
   } catch (error) {
     console.error('Approve review error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
+// Summarize reviews by date or latest (admin only)
+router.get('/summary', verifyToken, roleCheck(['admin']), async (req, res) => {
+  try {
+    const { date } = req.query;
+    let reviews;
+
+    if (date) {
+      const selectedDate = new Date(date);
+      reviews = await Review.find({
+        mealDate: {
+          $gte: new Date(selectedDate.setHours(0, 0, 0, 0)),
+          $lt: new Date(selectedDate.setHours(23, 59, 59, 999))
+        },
+        approved: true
+      }).populate('user', 'name email');
+    } else {
+      reviews = await Review.find({ approved: true })
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .populate('user', 'name email');
+    }
+
+    if (!reviews.length) {
+      return res.status(404).json({ success: false, message: 'No reviews found.' });
+    }
+
+    const summary = await summarizeReviews(reviews);
+    res.json({ success: true, summary });
+  } catch (error) {
+    console.error('Summarize reviews error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

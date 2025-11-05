@@ -4,15 +4,12 @@ import { mealService } from '../services/mealService';
 import { rebateService } from '../services/rebateService';
 import { reviewService } from '../services/reviewService';
 import { optoutService } from '../services/optoutService';
+import { EditProfile } from './EditProfile';
 
 interface StudentDashboardProps {
   user: User;
   onLogout: () => void;
 }
-
-
-
-
 
 const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) => {
   // States
@@ -28,6 +25,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
   const [rebateLoading, setRebateLoading] = useState(false);
   const [optOutLoading, setOptOutLoading] = useState(false);
   const [currentRebate, setCurrentRebate] = useState<Rebate | null>(null);
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -125,6 +123,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
     }
   };
 
+  const handleProfileUpdate = (updatedUser: User) => {
+    // Update local user state if needed
+    // This would require passing a callback from App.tsx to update the user state
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -155,6 +158,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 </svg>
                 <span className="text-sm font-medium text-gray-700">Welcome, {user.name}</span>
               </div>
+              <button
+                onClick={() => setShowEditProfile(true)}
+                className="btn-secondary flex items-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <span>Edit Profile</span>
+              </button>
               <button
                 onClick={onLogout}
                 className="btn-danger flex items-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg"
@@ -551,7 +563,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                   <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  Your Opt-Out History
+                  Opt-Out History
                 </h3>
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -570,7 +582,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{new Date(opt.endDate).toLocaleDateString()}</td>
                           <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">{opt.reason}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${opt.approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${opt.approved ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                               {opt.approved ? 'Approved' : 'Pending'}
                             </span>
                           </td>
@@ -584,6 +596,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
           </div>
         </div>
       </main>
+
+      {/* Edit Profile Modal */}
+      {showEditProfile && (
+        <EditProfile
+          user={user}
+          onProfileUpdate={handleProfileUpdate}
+          onClose={() => setShowEditProfile(false)}
+        />
+      )}
     </div>
   );
 };

@@ -140,8 +140,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
           </div>
 
-          {/* Student Signup Link */}
-          <div className="text-center">
+          {/* Forgot Password and Student Signup Links */}
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                Forgot your password?
+              </Link>
+            </p>
             <p className="text-sm text-gray-600">
               New student?{" "}
               <Link to="/student/signup" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">

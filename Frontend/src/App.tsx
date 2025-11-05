@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './components/LoginPage';
 import { StudentLoginPage } from './components/StudentLoginPage';
 import { StudentSignupPage } from './components/StudentSignupPage';
+import { ForgotPasswordPage } from './components/ForgotPasswordPage';
+import { ResetPasswordPage } from './components/ResetPasswordPage';
 import { AdminDashboard } from './components/AdminDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import { authService } from './services/authService';
@@ -75,36 +77,52 @@ function App() {
 
   return (
     <Routes>
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
-          user ? 
-          <Navigate to="/dashboard" /> : 
+          user ?
+          <Navigate to="/dashboard" /> :
           <LoginPage onLogin={handleLogin} />
-        } 
+        }
       />
-      <Route 
-        path="/student/login" 
+      <Route
+        path="/forgot-password"
         element={
-          user ? 
-          <Navigate to="/dashboard" /> : 
+          user ?
+          <Navigate to="/dashboard" /> :
+          <ForgotPasswordPage />
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          user ?
+          <Navigate to="/dashboard" /> :
+          <ResetPasswordPage />
+        }
+      />
+      <Route
+        path="/student/login"
+        element={
+          user ?
+          <Navigate to="/dashboard" /> :
           <StudentLoginPage onLogin={handleLogin} />
-        } 
+        }
       />
-      <Route 
-        path="/student/signup" 
+      <Route
+        path="/student/signup"
         element={
-          user ? 
-          <Navigate to="/dashboard" /> : 
+          user ?
+          <Navigate to="/dashboard" /> :
           <StudentSignupPage />
-        } 
+        }
       />
-      <Route 
-        path="/dashboard" 
+      <Route
+        path="/dashboard"
         element={
-          !user ? 
-          <Navigate to="/" /> : 
-          (user.role === 'admin' ? 
+          !user ?
+          <Navigate to="/" /> :
+          (user.role === 'admin' ?
             <div className="h-screen w-screen flex flex-col">
               <AdminDashboard user={user} onLogout={handleLogout} />
             </div> :
@@ -112,7 +130,7 @@ function App() {
               <StudentDashboard user={user} onLogout={handleLogout} />
             </div>
           )
-        } 
+        }
       />
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} />} />
     </Routes>

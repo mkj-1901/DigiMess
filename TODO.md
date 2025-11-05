@@ -1,28 +1,17 @@
-# Add Opt-Out Feature to StudentDashboard
+# TODO: Enhance Student and Admin Dashboards
 
-## Information Gathered
+## StudentDashboard.tsx Updates
 
-- Opt-out allows students to request skipping meals for date ranges with reason, needs admin approval.
-- Backend services and types are ready (optoutService, OptOut interface).
-- StudentDashboard has sections for meals, rebates, reviews.
+- [ ] Add Rebate Section: Include rebate calculator button, current rebate display, and rebate history table
+- [ ] Add Reviews Section: Include rating form, comment textarea, submit button, and past reviews table
+- [ ] Add Opt-Out Section: Include start/end date inputs, reason input, submit button, and opt-out history table
 
-## Plan
+## AdminDashboard.tsx Updates
 
-- [ ] Import optoutService in StudentDashboard.tsx
-- [ ] Add state variables: optOuts (OptOut[]), optOutForm ({startDate, endDate, reason}), optOutLoading (boolean)
-- [ ] Fetch opt-outs in useEffect alongside other data
-- [ ] Add new section "Opt-Out Requests" after Reviews section
-- [ ] Create form with date inputs and textarea for reason
-- [ ] Add submit button with loading state
-- [ ] Add table to display past opt-out requests with status
-- [ ] Handle form submission and refresh data
+- [ ] Enhance Stats: Add "Students Marked Attendance Today" stat card (calculate from attendance data)
+- [ ] Add Food Conclusion Section: Display average rating, number of reviews, and top approved comments
 
-## Dependent Files to Edit
+## Testing
 
-- Frontend/src/components/StudentDashboard.tsx
-
-## Followup Steps
-
-- [ ] Test submitting opt-out request
-- [ ] Verify opt-outs appear in history table
-- [ ] Check form validation and error handling
+- [ ] Test StudentDashboard: Verify all sections render and functions work (meal logging, rebate calc, review submit, opt-out submit)
+- [ ] Test AdminDashboard: Verify new stats and food conclusion display correctly

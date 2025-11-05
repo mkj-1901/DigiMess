@@ -1,11 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
+const PasswordResetToken = require('../models/PasswordResetToken');
 const { verifyToken } = require('../middleware/authMiddleware');
 
 const router = express.Router();
+
+// Email transporter (configure with your email service)
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // or your email service
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 // Helper function to generate tokens
 const generateTokens = async (user) => {
@@ -106,6 +117,133 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Register error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Forgot password route
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
+    }
+
+    // Delete any existing reset tokens for this user
+    await PasswordResetToken.deleteMany({ userId: user._id });
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Save reset token to DB
+    const resetTokenDoc = new PasswordResetToken({
+      userId: user._id,
+      token: resetToken,
+      expiresAt: resetTokenExpiresAt
+    });
+    await resetTokenDoc.save();
+
+    // Send email
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Password Reset - DigiMess',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Password Reset Request</h2>
+          <p>Hello ${user.name},</p>
+          <p>You requested a password reset for your DigiMess account.</p>
+          <p>Click the link below to reset your password:</p>
+          <a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Reset Password</a>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this reset, please ignore this email.</p>
+          <p>Best regards,<br>DigiMess Team</p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Reset password route
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Find reset token
+    const resetTokenDoc = await PasswordResetToken.findOne({ token });
+    if (!resetTokenDoc) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+    }
+
+    // Check if expired
+    if (resetTokenDoc.expiresAt < new Date()) {
+      await PasswordResetToken.deleteOne({ _id: resetTokenDoc._id });
+      return res.status(400).json({ success: false, message: 'Reset token has expired' });
+    }
+
+    // Find user
+    const user = await User.findById(resetTokenDoc.userId);
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    // Delete reset token
+    await PasswordResetToken.deleteOne({ _id: resetTokenDoc._id });
+
+    res.json({ success: true, message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Update profile route (protected)
+router.put('/update-profile', verifyToken, async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const userId = req.user.id;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Update fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (password) user.password = password;
+
+    await user.save();
+
+    // Return updated user data without password
+    const userResponse = {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      name: user.name
+    };
+
+    res.json({ success: true, user: userResponse, message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Update profile error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

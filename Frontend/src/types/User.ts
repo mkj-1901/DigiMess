@@ -21,6 +21,21 @@ export interface AuthResponse {
   token?: string;
 }
 
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
+export interface AdminStatsResponse {
+  success: boolean;
+  stats: {
+    totalUsers: number;
+    activeToday: number;
+    pendingRequests: number;
+  };
+}
+
 export interface MealAttendance {
   _id: string;
   user: User | string;
@@ -52,7 +67,9 @@ export interface Rebate {
   optOutDays: number;
   missedDays: number;
   calculatedAmount: number;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  calculatedAt: string;
+  createdAt?: string;
   approvedAt?: string;
   adminNotes?: string;
 }

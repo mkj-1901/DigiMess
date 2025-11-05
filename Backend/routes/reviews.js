@@ -58,10 +58,10 @@ router.get('/:userId', verifyToken, async (req, res) => {
   }
 });
 
-// Get all pending reviews (admin only)
+// Get all reviews for admin (admin only)
 router.get('/admin', verifyToken, roleCheck(['admin']), async (req, res) => {
   try {
-    const reviews = await Review.find({ approved: false })
+    const reviews = await Review.find({})
       .sort({ createdAt: -1 })
       .populate('user', 'name email');
 

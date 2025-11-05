@@ -179,6 +179,59 @@ export const authService = {
     }
   },
 
+  async forgotPassword(email: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
+      return response.data;
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to send reset email'
+      };
+    }
+  },
+
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword });
+      return response.data;
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to reset password'
+      };
+    }
+  },
+
+  async updateProfile(userData: { name?: string; email?: string; password?: string }): Promise<{ success: boolean; user?: User; message?: string }> {
+    try {
+      const response = await axiosInstance.put('/auth/update-profile', userData);
+      const data = response.data;
+
+      if (data.success && data.user) {
+        // Update stored user data
+        localStorage.setItem('user', JSON.stringify(data.user));
+        return {
+          success: true,
+          user: data.user
+        };
+      } else {
+        return {
+          success: false,
+          message: data.message || 'Profile update failed'
+        };
+      }
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Network error occurred'
+      };
+    }
+  },
+
   // Axios instance for other services to use
   axiosInstance,
 };

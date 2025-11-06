@@ -44,14 +44,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center animate-fade-in">
+    <div className="min-h-screen w-screen flex items-center justify-center animate-fade-in bg-gradient-to-br from-[#238548] to-[#a6efc2]">
       <div className="w-full max-w-md card p-8 animate-slide-in">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mb-4">
-            <svg className="mx-auto h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
+            <img
+              src="/favicon.svg"
+              alt="DigiMess Logo"
+              className="mx-auto h-12 w-12"
+            />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome to DigiMess
@@ -132,13 +134,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
 
           {/* Demo Credentials */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
             <div className="text-xs text-blue-800 space-y-1">
               <div><strong>Admin:</strong> admin@digimess.com / admin123</div>
               <div><strong>Student:</strong> student@digimess.com / student123</div>
             </div>
-          </div>
+          </div> */}
 
           {/* Forgot Password and Student Signup Links */}
           <div className="text-center space-y-2">

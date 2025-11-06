@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, vi, beforeEach, expect } from 'vitest';
-import AdminDashboard from '../AdminDashboard';
+import { AdminDashboard } from '../AdminDashboard';
 import { apiService } from '../../services/apiService';
 import { reviewService } from '../../services/reviewService';
 

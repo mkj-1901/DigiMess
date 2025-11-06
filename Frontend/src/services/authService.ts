@@ -179,22 +179,9 @@ export const authService = {
     }
   },
 
-  async forgotPassword(email: string): Promise<{ success: boolean; message?: string }> {
+  async resetPassword(email: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
-      return response.data;
-    } catch (error: any) {
-      console.error('Forgot password error:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to send reset email'
-      };
-    }
-  },
-
-  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, { token, newPassword });
+      const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, { email, newPassword });
       return response.data;
     } catch (error: any) {
       console.error('Reset password error:', error);
@@ -204,6 +191,8 @@ export const authService = {
       };
     }
   },
+
+
 
   async updateProfile(userData: { name?: string; email?: string; password?: string }): Promise<{ success: boolean; user?: User; message?: string }> {
     try {

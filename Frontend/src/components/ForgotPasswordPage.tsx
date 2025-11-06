@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 
 export const ForgotPasswordPage: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState(false);
@@ -14,15 +17,31 @@ export const ForgotPasswordPage: React.FC = () => {
     setError("");
     setSuccess(false);
 
+    // Password validation
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await authService.forgotPassword(email);
+      const response = await authService.resetPassword(email, newPassword);
       if (response.success) {
         setSuccess(true);
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
       } else {
-        setError(response.message || "Failed to send reset email");
+        setError(response.message || "Failed to reset password");
       }
     } catch (err) {
-      setError("An error occurred while sending reset email");
+      setError("An error occurred while resetting password");
     } finally {
       setLoading(false);
     }
@@ -39,17 +58,11 @@ export const ForgotPasswordPage: React.FC = () => {
               </svg>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Check Your Email
+              Password Reset Successful
             </h2>
             <p className="text-gray-600">
-              We've sent a password reset link to {email}
+              Your password has been reset successfully. Redirecting to login...
             </p>
-          </div>
-
-          <div className="text-center">
-            <Link to="/" className="btn-primary">
-              Back to Login
-            </Link>
           </div>
         </div>
       </div>
@@ -76,20 +89,56 @@ export const ForgotPasswordPage: React.FC = () => {
 
         {/* Form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-input"
-            />
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-input"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                New Password
+              </label>
+              <input
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="form-input"
+                minLength={6}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm New Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="form-input"
+                minLength={6}
+              />
+            </div>
           </div>
 
           {/* Error */}
@@ -114,14 +163,14 @@ export const ForgotPasswordPage: React.FC = () => {
               {loading ? (
                 <>
                   <div className="spinner mr-2"></div>
-                  Sending...
+                  Resetting Password...
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                   </svg>
-                  Send Reset Link
+                  Reset Password
                 </>
               )}
             </button>

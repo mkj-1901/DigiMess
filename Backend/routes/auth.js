@@ -180,32 +180,17 @@ router.post('/forgot-password', async (req, res) => {
 // Reset password route
 router.post('/reset-password', async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
+    const { email, newPassword } = req.body;
 
-    // Find reset token
-    const resetTokenDoc = await PasswordResetToken.findOne({ token });
-    if (!resetTokenDoc) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
-    }
-
-    // Check if expired
-    if (resetTokenDoc.expiresAt < new Date()) {
-      await PasswordResetToken.deleteOne({ _id: resetTokenDoc._id });
-      return res.status(400).json({ success: false, message: 'Reset token has expired' });
-    }
-
-    // Find user
-    const user = await User.findById(resetTokenDoc.userId);
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ success: false, message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     // Update password
     user.password = newPassword;
     await user.save();
-
-    // Delete reset token
-    await PasswordResetToken.deleteOne({ _id: resetTokenDoc._id });
 
     res.json({ success: true, message: 'Password reset successfully' });
   } catch (error) {

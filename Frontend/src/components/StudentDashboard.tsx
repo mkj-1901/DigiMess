@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react"; // Added useRef
 import type {
   User,
   MealAttendance,
@@ -11,6 +11,41 @@ import { rebateService } from "../services/rebateService";
 import { reviewService } from "../services/reviewService";
 import { optoutService } from "../services/optoutService";
 import { EditProfile } from "./EditProfile";
+
+// --- DESIGN IMPROVEMENT (REQUEST 2) ---
+// Solid star icon for filled state
+const SolidStarIcon = ({ className }: { className: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+  >
+    <path
+      fillRule="evenodd"
+      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.007z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
+
+// Hollow star icon for empty state
+const HollowStarIcon = ({ className }: { className: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className={className}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.31h5.513c.498 0 .703.656.32.99l-4.38 3.135a.563.563 0 00-.182.635l1.658 5.36a.562.562 0 01-.812.622l-4.38-3.135a.563.563 0 00-.656 0l-4.38 3.135a.562.562 0 01-.812-.622l1.658-5.36a.563.563 0 00-.182-.635l-4.38-3.135a.562.562 0 01.32-.99h5.513a.563.563 0 00.475-.31l2.125-5.111z"
+    />
+  </svg>
+);
 
 interface StudentDashboardProps {
   user: User;
@@ -36,6 +71,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     dinner: false,
   });
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: "" });
+  const [hoverRating, setHoverRating] = useState(0);
   const [optOutForm, setOptOutForm] = useState({
     startDate: "",
     endDate: "",
@@ -45,6 +81,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [optOutLoading, setOptOutLoading] = useState(false);
   const [currentRebate, setCurrentRebate] = useState<Rebate | null>(null);
   const [showEditProfile, setShowEditProfile] = useState(false);
+
+  // --- DESIGN IMPROVEMENT (REQUEST 1) ---
+  // State for the profile dropdown menu
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -73,6 +114,23 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     fetchData();
   }, [user.id]);
 
+  // --- DESIGN IMPROVEMENT (REQUEST 1) ---
+  // Effect to handle clicking outside the profile menu to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleMealChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMealForm({ ...mealForm, [e.target.name]: e.target.checked });
   };
@@ -81,7 +139,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     try {
       const res = await mealService.logAttendance({ date: today, ...mealForm });
       if (res.success) {
-        // Refresh history
         const historyRes = await mealService.getHistory(user.id);
         if (historyRes.success) setAttendanceHistory(historyRes.history);
         setMealForm({ breakfast: false, lunch: false, dinner: false });
@@ -117,7 +174,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
         ...reviewForm,
       });
       if (res.success) {
-        // Refresh reviews
         const reviewsRes = await reviewService.getReviews(user.id);
         if (reviewsRes.success) setReviews(reviewsRes.reviews);
         setReviewForm({ rating: 5, comment: "" });
@@ -136,7 +192,6 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
       setOptOutLoading(true);
       const res = await optoutService.submitOptOut(optOutForm);
       if (res.success) {
-        // Refresh opt-outs
         const optOutsRes = await optoutService.getOptOuts(user.id);
         if (optOutsRes.success) setOptOuts(optOutsRes.optOuts);
         setOptOutForm({ startDate: "", endDate: "", reason: "" });
@@ -148,7 +203,21 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
     }
   };
 
-  const handleProfileUpdate = (updatedUser: User) => {};
+  const handleProfileUpdate = (updatedUser: User) => {
+    console.log("Profile updated", updatedUser);
+    setShowEditProfile(false);
+  };
+
+  // --- Handlers for profile menu actions ---
+  const handleEditProfileClick = () => {
+    setShowEditProfile(true);
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    onLogout();
+    setIsProfileMenuOpen(false);
+  };
 
   if (loading) {
     return (
@@ -160,89 +229,122 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   return (
     <div className="dashboard-bg min-h-screen">
-      <nav className="nav">
-        <div className="px-4 sm:px-6 lg:px-8 py-1">
+      <nav className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center rounded">
-                <div className="flex items-center space-x-3 text-xs">
-                  <div className="p-2 rounded-lg">
-                    <img
-                      src="/favicon.svg"
-                      alt="DigiMess Logo"
-                      className="h-10 w-10"
-                    />
-                  </div>
+            <div className="flex items-center">
+              <div className="flex items-center space-x-3">
+                <div className="bg-white p-2 rounded-lg shadow-md border border-gray-100">
+                  <img
+                    src="/favicon.svg"
+                    alt="DigiMess Logo"
+                    className="h-8 w-8"
+                  />
+                </div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  DigiMess Student Portal
+                  DigiMess
                 </h1>
               </div>
             </div>
+
+            {/* --- DESIGN IMPROVEMENT (REQUEST 1) ---
+                This is the new Profile Dropdown Menu
+            */}
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-full border border-blue-100">
-                <svg
-                  className="h-5 w-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="relative" ref={profileMenuRef}>
+                {/* Clickable Welcome Card */}
+                <button
+                  onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-full border border-blue-100 hover:shadow-md transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span className="text-sm font-medium text-gray-700">
-                  Welcome, {user.name}
-                </span>
+                  <svg
+                    className="h-5 w-5 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-700">
+                    Welcome, {user.name}
+                  </span>
+                  {/* Dropdown arrow */}
+                  <svg
+                    className={`h-4 w-4 text-gray-600 transition-transform ${
+                      isProfileMenuOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu Panel */}
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-200 z-50">
+                    <span
+                      onClick={handleEditProfileClick}
+                      className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 transition-colors"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                      <span>Edit Profile</span>
+                    </span>
+                    <span
+                      onClick={handleLogoutClick}
+                      className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-red-600 transition-colors"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      <span>Logout</span>
+                    </span>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => setShowEditProfile(true)}
-                className="btn-secondary flex items-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                <span>Edit Profile</span>
-              </button>
-              <button
-                onClick={onLogout}
-                className="btn-danger flex items-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
-                <span>Logout</span>
-              </button>
             </div>
+            {/* --- End of Profile Dropdown --- */}
           </div>
         </div>
       </nav>
 
-      <main className="py-8 sm:px-6 lg:px-8">
+      <main className="py-12 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-0">
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20">
-            <div className="text-center mb-8">
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-white/20">
+            <div className="text-center mb-10">
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
                 Your Dashboard
               </h1>
@@ -340,7 +442,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </div>
                 <button
                   onClick={submitAttendance}
-                  className="btn-primary w-full md:w-auto flex items-center justify-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg"
+                  className="flex items-center justify-center space-x-2 w-full md:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
                 >
                   <svg
                     className="w-5 h-5"
@@ -459,7 +561,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <button
                   onClick={calculateRebate}
                   disabled={rebateLoading}
-                  className="btn-success w-full md:w-auto flex items-center justify-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50"
+                  className="flex items-center justify-center space-x-2 w-full md:w-auto px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {rebateLoading ? (
                     <>
@@ -629,24 +731,28 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Rating (1-5)
+                      Rating
                     </label>
-                    <div className="flex space-x-2">
+                    {/* --- DESIGN IMPROVEMENT (REQUEST 2) ---
+                        New Hollow/Solid interactive star rating UI
+                    */}
+                    <div className="flex space-x-1">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <button
+                        <span
                           key={star}
-                          type="button"
                           onClick={() =>
                             setReviewForm({ ...reviewForm, rating: star })
                           }
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                            star <= reviewForm.rating
-                              ? "bg-yellow-400 text-white shadow-lg"
-                              : "bg-gray-200 text-gray-400 hover:bg-gray-300"
-                          }`}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          className="p-1 rounded-full text-gray-400 transition-colors duration-150"
                         >
-                          ★
-                        </button>
+                          {star <= (hoverRating || reviewForm.rating) ? (
+                            <SolidStarIcon className="w-10 h-10 text-yellow-400" />
+                          ) : (
+                            <HollowStarIcon className="w-10 h-10 text-gray-400" />
+                          )}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -666,11 +772,12 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   </div>
                 </div>
 
-                <button
+                <span
                   onClick={submitReview}
-                  className="btn-primary w-full md:w-auto flex items-center justify-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg"
+                  className="flex items-center justify-center space-x-2 w-[50%] max-w-[50%] md:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
                 >
                   <svg
+                    transform="rotate(40)"
                     className="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
@@ -684,7 +791,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     />
                   </svg>
                   <span>Submit Review</span>
-                </button>
+                </span>
               </div>
 
               {/* Past reviews table */}
@@ -734,19 +841,23 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                               {new Date(rev.mealDate).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {/* --- DESIGN IMPROVEMENT (REQUEST 2) ---
+                                  Using new star icons in the table for consistency
+                              */}
                               <div className="flex items-center">
-                                {Array.from({ length: 5 }, (_, i) => (
-                                  <span
-                                    key={i}
-                                    className={
-                                      i < rev.rating
-                                        ? "text-yellow-400"
-                                        : "text-gray-300"
-                                    }
-                                  >
-                                    ★
-                                  </span>
-                                ))}
+                                {Array.from({ length: 5 }, (_, i) =>
+                                  i < rev.rating ? (
+                                    <SolidStarIcon
+                                      key={i}
+                                      className="w-5 h-5 text-yellow-400"
+                                    />
+                                  ) : (
+                                    <HollowStarIcon
+                                      key={i}
+                                      className="w-5 h-5 text-gray-300"
+                                    />
+                                  )
+                                )}
                               </div>
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
@@ -828,7 +939,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <button
                   onClick={submitOptOut}
                   disabled={optOutLoading}
-                  className="btn-danger w-full md:w-auto flex items-center justify-center space-x-2 hover:scale-105 transition-all duration-200 shadow-lg disabled:opacity-50"
+                  className="flex items-center justify-center space-x-2 w-full md:w-auto px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-red-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {optOutLoading ? (
                     <>
@@ -913,7 +1024,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${
                                   opt.approved
                                     ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
+                                    : "bg-yellow-100 text-yellow-800"
                                 }`}
                               >
                                 {opt.approved ? "Approved" : "Pending"}

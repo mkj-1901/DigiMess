@@ -15,8 +15,8 @@
   -moz-osx-font-smoothing: grayscale;
 
   /* Custom CSS Variables for DigiMess Theme */
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
+  --primary-color: #10b981;
+  --primary-hover: #208765;
   --secondary-color: #64748b;
   --accent-color: #f59e0b;
   --success-color: #10b981;
@@ -44,7 +44,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #28984d 0%, #0bff5c 100%);
   font-family: 'Inter', sans-serif;
 }
 

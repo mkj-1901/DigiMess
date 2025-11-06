@@ -112,7 +112,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   return (
     <div className="dashboard-bg min-h-screen">
       <nav className="nav">
-        <div className="px-4 sm:px-6 lg:px-8 py-1">
+        <div className="px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex justify-between h-16">
             <div className="flex items-center rounded">
                 <div className="flex items-center space-x-3 text-xs">
@@ -124,7 +124,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     />
                   </div>
                   <h1 className="text-base font-bold text-gray-900">
-                    DigiMess Admin Dashboard
+                    DigiMess
                   </h1>
                 </div>
             </div>
@@ -383,11 +383,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {reviewSummary ? (
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
-                      <div className="text-3xl font-bold text-yellow-600">
+                      <div className="text-3xl font-bold text-yellow-400">
                         {reviewSummary.averageRating?.toFixed(1) || "N/A"}
                       </div>
                       <div className="text-gray-600 text-sm">
                         Average Rating (out of 5)
+                      </div>
+                      <div className="flex justify-end ms-199">
+                        <div className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-[#000] rounded-lg shadow-md font-semibold">
+                          Total Reviews: {reviews.length}
+                        </div>
                       </div>
                     </div>
 
@@ -803,7 +808,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
               {showReviews && (
                 <div className="mt-4 bg-white rounded-lg shadow overflow-hidden">
-                  <div className="p-4 bg-purple-50 border-l-4 border-purple-400">
+                  <div className="p-4 bg-purple-50">
                     <p className="text-sm text-purple-700">
                       View all student reviews and feedback. This includes both
                       approved and pending reviews to monitor food quality and
@@ -824,9 +829,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Comment
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Submitted
@@ -865,17 +867,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-900">
                             {rev.comment || "No comment"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                rev.approved
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {rev.approved ? "Approved" : "Pending"}
-                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {rev.createdAt
@@ -1007,47 +998,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </table>
                 </div>
               )}
-            </section>
-
-            {/* Food Conclusion Section */}
-            <section className="mt-12">
-              <h3 className="text-xl font-bold mb-4">Food Conclusion</h3>
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">
-                      {reviewSummary?.averageRating?.toFixed(1) || "N/A"}
-                    </div>
-                    <div className="text-sm text-gray-500">Average Rating</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">
-                      {reviews.length}
-                    </div>
-                    <div className="text-sm text-gray-500">Total Reviews</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600">
-                      {reviews.filter((r) => r.approved).length}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      Approved Reviews
-                    </div>
-                  </div>
-                </div>
-                {reviewSummary?.summaryText && (
-                  <div className="mt-6">
-                    <h4 className="text-lg font-semibold mb-4">
-                      Summarized Feedback
-                    </h4>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-700 italic">
-                        {reviewSummary.summaryText}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
             </section>
           </div>
         </div>

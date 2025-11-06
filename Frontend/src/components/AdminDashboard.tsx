@@ -529,40 +529,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </tr>
                       ))}
 
-                    {/* Pending Reviews (display only, backend handles moderation) */}
-                    {reviews
-                      .filter((rev) => rev.approved === false)
-                      .map((rev) => (
-                        <tr key={`review-${rev._id}`} className="bg-purple-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-800">
-                            Review
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {typeof rev.user === "object"
-                              ? rev.user.name
-                              : rev.user}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            Rating: {rev.rating}/5
-                            <br />
-                            <span className="text-xs text-gray-500">
-                              {rev.comment
-                                ? rev.comment.substring(0, 80) +
-                                  (rev.comment.length > 80 ? "..." : "")
-                                : "No comment"}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {rev.createdAt
-                              ? new Date(rev.createdAt).toLocaleDateString()
-                              : "N/A"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 italic">
-                            Backend handles moderation
-                          </td>
-                        </tr>
-                      ))}
-
                     {/* No pending requests message */}
                     {optOuts.filter((opt) => opt.approved === false).length ===
                       0 &&

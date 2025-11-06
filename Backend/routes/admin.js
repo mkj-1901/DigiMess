@@ -8,6 +8,34 @@ const { verifyToken, roleCheck } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+// Get review summary for admin (admin only)
+const { summarizeReviews } = require('../ml/summarizer');
+
+router.get('/reviews/summary', verifyToken, roleCheck(['admin']), async (req, res) => {
+  try {
+    const reviews = await Review.find({})
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate('user', 'name email');
+
+    if (!reviews.length) {
+      return res
+        .status(404)
+        .json({ success: false, data: { averageRating: 0, summaryText: 'No reviews found.' } });
+    }
+
+    const summary = await summarizeReviews(reviews);
+
+    // Send with `data` key to match frontend expectations
+    res.json({ success: true, data: summary });
+  } catch (error) {
+    console.error('Admin summary route error:', error);
+    res
+      .status(500)
+      .json({ success: false, data: { averageRating: 0, summaryText: 'Error generating summary.' } });
+  }
+});
+
 // Get admin stats (admin only)
 router.get('/stats', verifyToken, roleCheck(['admin']), async (req, res) => {
   try {
@@ -98,42 +126,6 @@ router.get('/attendance', verifyToken, roleCheck(['admin']), async (req, res) =>
     res.json({ success: true, data: attendance });
   } catch (error) {
     console.error('Get admin attendance error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Get review summary for admin (admin only)
-router.get('/reviews/summary', verifyToken, roleCheck(['admin']), async (req, res) => {
-  try {
-    const reviews = await Review.find({});
-
-    const totalReviews = reviews.length;
-    const averageRating = totalReviews > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews : 0;
-
-    // Group by rating
-    const ratingCounts = reviews.reduce((acc, r) => {
-      acc[r.rating] = (acc[r.rating] || 0) + 1;
-      return acc;
-    }, {});
-
-    // Recent reviews (last 30 days)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentReviews = reviews.filter(r => r.createdAt >= thirtyDaysAgo);
-    const recentAverageRating = recentReviews.length > 0 ? recentReviews.reduce((sum, r) => sum + r.rating, 0) / recentReviews.length : 0;
-
-    res.json({
-      success: true,
-      data: {
-        totalReviews,
-        averageRating: Math.round(averageRating * 10) / 10,
-        ratingCounts,
-        recentReviewsCount: recentReviews.length,
-        recentAverageRating: Math.round(recentAverageRating * 10) / 10
-      }
-    });
-  } catch (error) {
-    console.error('Get review summary error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

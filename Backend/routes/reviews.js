@@ -109,11 +109,10 @@ router.get('/summary', verifyToken, roleCheck(['admin']), async (req, res) => {
         mealDate: {
           $gte: new Date(selectedDate.setHours(0, 0, 0, 0)),
           $lt: new Date(selectedDate.setHours(23, 59, 59, 999))
-        },
-        approved: true
+        }
       }).populate('user', 'name email');
     } else {
-      reviews = await Review.find({ approved: true })
+      reviews = await Review.find({})
         .sort({ createdAt: -1 })
         .limit(50)
         .populate('user', 'name email');
@@ -124,7 +123,7 @@ router.get('/summary', verifyToken, roleCheck(['admin']), async (req, res) => {
     }
 
     const summary = await summarizeReviews(reviews);
-    res.json({ success: true, summary });
+    res.json({ success: true, data : summary });
   } catch (error) {
     console.error('Summarize reviews error:', error);
     res.status(500).json({ success: false, message: 'Server error' });

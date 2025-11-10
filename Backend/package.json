@@ -20,6 +20,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
+    "nodemailer": "^7.0.10",
     "openai": "^6.8.1",
     "sentiment": "^5.0.2"
   },

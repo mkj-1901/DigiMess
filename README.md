@@ -1,100 +1,176 @@
 DIGIMESS: A Comprehensive Mess Management System
-1. Project Overview
-DIGIMESS is a web-based application designed to streamline mess operations for both students and administrators. It provides features for menu viewing, attendance tracking, feedback submission, and administrative controls.
-2. Team Roles and Responsibilities
-Role
-Team Members
-Frontend Developer
-Devansh Rai, Krish Dhaked, Amar Singh
-Backend Developer
-Himanshu Vitthalani, Mayank Jha
-Database Designer
-Devansh Rai, Aryan Shrivastava
-Tester
-Himanshu Vitthalani, Krish Dhaked
-Model Training (ML)
-Mayank Jha, Himanshu Vitthalani
-Documentation Specialist
-Aryan Shrivastava, Amar Singh
 
-3. Tools & Technologies
-Frontend: React, Tailwind CSS, TypeScript
-Backend: Node.js, Express.js, JWT Authentication
-Database: MongoDB / MySQL
-Hosting:
-Frontend: Vercel
-Backend: Render
-Database: MongoDB Atlas (for MongoDB) / PlanetScale (for MySQL)
-Extras: GitHub, Firebase
-4. User Screens Layout
-4.1. Common Screens
-4.1.1. Login Screen
-Purpose: Authenticate users (students/admins).
-Fields: Email, Password.
-Actions: Login button, Forgot Password (links to password reset).
-Backend Flow: Verifies credentials and returns a JWT token upon successful authentication.
-4.1.2. Profile Screen
-Purpose: Allow users to view and update personal details.
-Sections:
-Name, Email, Contact Information
-Password Change option
-View Bill History
-Attendance History
-4.2. Student Screens
-4.2.1. Student Dashboard
-Purpose: Main landing page for students after login.
-Widgets/Sections:
-Today’s Menu (Breakfast/Lunch/Dinner)
-Monthly Attendance Summary
-Pending Bill Amount
-Quick Links: Give Feedback, Pay Bill, View Complaints
-4.2.2. Menu Screen
-Purpose: Display weekly/daily mess menu.
-Features:
-Tabs for Breakfast, Lunch, Dinner.
-Date-wise menu navigation.
-4.2.3. Attendance Screen
-Purpose: Students can check their meal attendance records.
-Features:
-Calendar view indicating presence/absence.
-Option to download attendance report.
-4.2.4. Complaint & Feedback Screen
-Purpose: Enable students to submit feedback or report issues.
-Fields: Complaint text (textarea), Image upload (optional).
-ML Integration: Complaint sentiment is automatically classified (Positive/Negative/Neutral).
-History Section: Lists submitted complaints with their current status (pending/resolved).
-4.3. Admin Screens
-4.3.1. Admin Dashboard
-Purpose: Provide an overview of mess activities for administrators.
-Widgets/Sections:
-Total Registered Students
-Daily Attendance Summary
-Complaints (with sentiment filter)
-Quick link for Menu Updates
-4.3.2. User Management Screen
-Purpose: Manage student records.
-Features:
-List of students with search and filter capabilities.
-Functions to Add, Edit, and Delete student accounts.
-4.3.3. Menu Management Screen
-Purpose: Allow administrators to add and update the mess menu.
-Fields: Date, Meal type, Menu items.
-Actions: Add New Menu, Edit/Delete existing menu items.
-4.3.4. Attendance Reports Screen
-Purpose: Track student attendance and generate reports.
-Features:
-Table view displaying student names and meal attendance.
-Filter by date range.
-Export functionality (CSV/PDF).
-4.3.5. Complaint Management Screen
-Purpose: Administrators resolve complaints and feedback.
-Features:
-Complaint list with Sentiment Analysis Tag (from Hugging Face).
-Option to mark complaints as resolved.
-View complaint history.
-5. Backend Design Layout & Tools
-5.1. System Architecture
-The DigiMess system will adhere to a 3-tier architecture:
+1. Project Overview
+   DIGIMESS is a web-based application designed to streamline mess operations for both students and administrators. It provides features for menu viewing, attendance tracking, feedback submission, and administrative controls.
+2. Getting Started
+
+## Prerequisites
+
+- Node.js (version 16 or higher)
+- npm (comes with Node.js)
+- MongoDB (local installation or MongoDB Atlas account)
+
+## Installation
+
+1. Clone the repository:
+
+   ```
+   git clone <repository-url>
+   cd digimess
+   ```
+
+2. Install backend dependencies:
+
+   ```
+   cd Backend
+   npm install
+   ```
+
+3. Install frontend dependencies:
+   ```
+   cd ../Frontend
+   npm install
+   ```
+
+## Environment Setup
+
+1. Create a `.env` file in the `Backend` directory with the following variables:
+
+   ```
+   MONGO_URI=mongodb://localhost:27017/digimess  # For local MongoDB
+   # OR for MongoDB Atlas: mongodb+srv://<username>:<password>@cluster.mongodb.net/digimess?retryWrites=true&w=majority
+   JWT_SECRET=your_jwt_secret_key_here
+   PORT=5000
+   ```
+
+2. Ensure MongoDB is running locally (if using local MongoDB):
+   - Start MongoDB service on your system.
+
+## Running the Application
+
+1. Seed the database with sample data (optional, but recommended for testing):
+
+   ```
+   cd Backend
+   npm run seed
+   ```
+
+2. Start the backend server:
+
+   ```
+   npm run dev
+   ```
+
+   The backend will run on `http://localhost:5000`.
+
+3. In a new terminal, start the frontend:
+   ```
+   cd ../Frontend
+   npm run dev
+   ```
+   The frontend will run on `http://localhost:5173`.
+
+## Demo Credentials
+
+After seeding, you can log in with the following accounts:
+
+- **Admin**: admin@digimess.com / admin123
+- **Students**: student1@digimess.com to student5@digimess.com / student123
+
+3. Team Roles and Responsibilities
+   Role
+   Team Members
+   Frontend Developer
+   Devansh Rai, Krish Dhaked, Amar Singh
+   Backend Developer
+   Himanshu Vitthalani, Mayank Jha
+   Database Designer
+   Devansh Rai, Aryan Shrivastava
+   Tester
+   Himanshu Vitthalani, Krish Dhaked
+   Model Training (ML)
+   Mayank Jha, Himanshu Vitthalani
+   Documentation Specialist
+   Aryan Shrivastava, Amar Singh
+
+4. Tools & Technologies
+   Frontend: React, Tailwind CSS, TypeScript
+   Backend: Node.js, Express.js, JWT Authentication
+   Database: MongoDB / MySQL
+   Hosting:
+   Frontend: Vercel
+   Backend: Render
+   Database: MongoDB Atlas (for MongoDB) / PlanetScale (for MySQL)
+   Extras: GitHub, Firebase
+5. User Screens Layout
+   4.1. Common Screens
+   4.1.1. Login Screen
+   Purpose: Authenticate users (students/admins).
+   Fields: Email, Password.
+   Actions: Login button, Forgot Password (links to password reset).
+   Backend Flow: Verifies credentials and returns a JWT token upon successful authentication.
+   4.1.2. Profile Screen
+   Purpose: Allow users to view and update personal details.
+   Sections:
+   Name, Email, Contact Information
+   Password Change option
+   View Bill History
+   Attendance History
+   4.2. Student Screens
+   4.2.1. Student Dashboard
+   Purpose: Main landing page for students after login.
+   Widgets/Sections:
+   Today’s Menu (Breakfast/Lunch/Dinner)
+   Monthly Attendance Summary
+   Pending Bill Amount
+   Quick Links: Give Feedback, Pay Bill, View Complaints
+   4.2.2. Menu Screen
+   Purpose: Display weekly/daily mess menu.
+   Features:
+   Tabs for Breakfast, Lunch, Dinner.
+   Date-wise menu navigation.
+   4.2.3. Attendance Screen
+   Purpose: Students can check their meal attendance records.
+   Features:
+   Calendar view indicating presence/absence.
+   Option to download attendance report.
+   4.2.4. Complaint & Feedback Screen
+   Purpose: Enable students to submit feedback or report issues.
+   Fields: Complaint text (textarea), Image upload (optional).
+   ML Integration: Complaint sentiment is automatically classified (Positive/Negative/Neutral).
+   History Section: Lists submitted complaints with their current status (pending/resolved).
+   4.3. Admin Screens
+   4.3.1. Admin Dashboard
+   Purpose: Provide an overview of mess activities for administrators.
+   Widgets/Sections:
+   Total Registered Students
+   Daily Attendance Summary
+   Complaints (with sentiment filter)
+   Quick link for Menu Updates
+   4.3.2. User Management Screen
+   Purpose: Manage student records.
+   Features:
+   List of students with search and filter capabilities.
+   Functions to Add, Edit, and Delete student accounts.
+   4.3.3. Menu Management Screen
+   Purpose: Allow administrators to add and update the mess menu.
+   Fields: Date, Meal type, Menu items.
+   Actions: Add New Menu, Edit/Delete existing menu items.
+   4.3.4. Attendance Reports Screen
+   Purpose: Track student attendance and generate reports.
+   Features:
+   Table view displaying student names and meal attendance.
+   Filter by date range.
+   Export functionality (CSV/PDF).
+   4.3.5. Complaint Management Screen
+   Purpose: Administrators resolve complaints and feedback.
+   Features:
+   Complaint list with Sentiment Analysis Tag (from Hugging Face).
+   Option to mark complaints as resolved.
+   View complaint history.
+6. Backend Design Layout & Tools
+   5.1. System Architecture
+   The DigiMess system will adhere to a 3-tier architecture:
 
 Frontend (Client Layer): A React.js web application through which students and administrators interact.
 Backend (Application Layer): A Node.js with Express.js REST API responsible for handling business logic, authentication, and data validations.
@@ -124,8 +200,7 @@ Validates input.
 Finds the user in the database.
 Compares the provided password using bcrypt for security.
 If credentials are valid, a JWT token is generated and sent to the frontend.
-Otherwise, an error message is returned.
-6. Database Design & Table Description
+Otherwise, an error message is returned. 6. Database Design & Table Description
 6.1. Database Tool
 Technology: MySQL (Relational Database)
 Reason: Chosen for structured data (users, payments, attendance) which benefits from easier querying with joins.
@@ -192,9 +267,9 @@ Primary Key: complaint_id
 Foreign Key: user_id references users(user_id).ML Integration Explanation7.1. Full Process Example: Complaint & Feedback Handling with Sentiment AnalysisFrontend (React.js)
 
 7. ML Integration Explanation
-7.1. Full Process Example: Complaint & Feedback Handling with Sentiment
+   7.1. Full Process Example: Complaint & Feedback Handling with Sentiment
 
- AnalysisFrontend (React.js)
+AnalysisFrontend (React.js)
 Student writes a complaint/feedback (e.g., "The food quality is bad today").
 On submitting the form, the complaint text is sent via Axios POST request to the backend API /api/complaints/add.
 Backend (Node.js + Express + Hugging Face/Transformer ML)

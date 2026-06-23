@@ -2,9 +2,8 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import type { User, LoginCredentials, AuthResponse } from '../types/User';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
-// Create axios instance
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -12,14 +11,12 @@ const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
-// Helper utility to safely wipe local auth storage without relying on uninitialized authService
 const clearLocalAuthData = () => {
   localStorage.removeItem('user');
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
 };
 
-// Request interceptor to attach access token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
@@ -31,40 +28,35 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle token refresh
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Trigger only on 401 and prevent infinite recursion loops using _retry flag
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          // Use vanilla axios instance to avoid sending expired auth headers to the refresh endpoint
-          const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+          const cleanBase = API_BASE_URL.replace(/\/$/, "");
+          const refreshResponse = await axios.post(`${cleanBase}/auth/refresh`, {
             refreshToken,
           });
 
           if (refreshResponse.data.success) {
             const { accessToken, refreshToken: newRefreshToken } = refreshResponse.data;
 
-            // Update tokens in localStorage
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', newRefreshToken);
 
-            // Retry original request with new token attached
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             return axiosInstance(originalRequest);
           }
         }
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         console.error('Token refresh failed:', refreshError);
         
-        // FIX: Replaced authService.logout() with clean manual swipe to avoid circular reference crashes
         clearLocalAuthData();
         window.location.href = '/'; 
       }

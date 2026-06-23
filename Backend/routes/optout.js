@@ -84,18 +84,4 @@ router.get('/:userId', verifyToken, async (req, res) => {
   }
 });
 
-// Get all opt-outs for admin (admin only)
-router.get('/admin', verifyToken, roleCheck(['admin']), async (req, res) => {
-  try {
-    const optOuts = await OptOut.find({})
-      .populate('user', 'name email')
-      .sort({ createdAt: -1 });
-
-    res.json({ success: true, optOuts });
-  } catch (error) {
-    console.error('Get admin opt-outs error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
 module.exports = router;

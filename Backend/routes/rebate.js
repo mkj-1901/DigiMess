@@ -104,9 +104,6 @@ router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) =
         rebate.approvedAt = new Date();
       }
     }
-    if (notes !== undefined) {
-      rebate.adminNotes = notes; // Add adminNotes field if needed, but model has no field; assume add to schema later or use status
-    }
 
     await rebate.save();
 
@@ -134,20 +131,6 @@ router.get('/:userId', verifyToken, async (req, res) => {
     res.json({ success: true, rebates });
   } catch (error) {
     console.error('Get rebates error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Get all rebates for admin (admin only)
-router.get('/admin', verifyToken, roleCheck(['admin']), async (req, res) => {
-  try {
-    const rebates = await Rebate.find({})
-      .populate('user', 'name email')
-      .sort({ calculatedAt: -1 });
-
-    res.json({ success: true, rebates });
-  } catch (error) {
-    console.error('Get admin rebates error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

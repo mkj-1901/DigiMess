@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { authService } from "../services/authService";
 import type { LoginCredentials } from "../types/User";
 
@@ -131,6 +132,40 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 </>
               )}
             </button>
+          </div>
+
+          {/* Divider */}
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          {/* Google Login Button */}
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  setLoading(true);
+                  setError("");
+                  try {
+                    const response = await authService.googleLogin(credentialResponse.credential);
+                    if (response.success && response.user) {
+                      onLogin(response.user);
+                    } else {
+                      setError(response.message || "Google login failed");
+                    }
+                  } catch (err) {
+                    setError("An error occurred during Google login");
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+              }}
+              onError={() => {
+                setError("Google Login failed");
+              }}
+            />
           </div>
 
           {/* Demo Credentials */}

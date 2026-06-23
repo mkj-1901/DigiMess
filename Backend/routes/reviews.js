@@ -1,7 +1,6 @@
 const express = require('express');
 const Review = require('../models/Review');
 const { verifyToken, roleCheck } = require('../middleware/authMiddleware');
-const { summarizeReviews } = require('../ml/summarizer');
 
 const router = express.Router();
 
@@ -38,41 +37,6 @@ router.post('/submit', verifyToken, roleCheck(['student']), async (req, res) => 
   }
 });
 
-// Get user's reviews
-router.get('/:userId', verifyToken, async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Students can only access their own
-    if (req.user.role === 'student' && userId !== req.user.id.toString()) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
-    }
-
-    const reviews = await Review.find({ user: userId })
-      .sort({ createdAt: -1 })
-      .populate('user', 'name email');
-
-    res.json({ success: true, reviews });
-  } catch (error) {
-    console.error('Get reviews error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
-// Get all reviews for admin (admin only)
-router.get('/admin', verifyToken, roleCheck(['admin']), async (req, res) => {
-  try {
-    const reviews = await Review.find({})
-      .sort({ createdAt: -1 })
-      .populate('user', 'name email');
-
-    res.json({ success: true, reviews });
-  } catch (error) {
-    console.error('Get admin reviews error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-
 // Approve/reject review (admin only)
 router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) => {
   try {
@@ -96,36 +60,23 @@ router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) =
   }
 });
 
-
-// Summarize reviews by date or latest (admin only)
-router.get('/summary', verifyToken, roleCheck(['admin']), async (req, res) => {
+// Get user's reviews
+router.get('/:userId', verifyToken, async (req, res) => {
   try {
-    const { date } = req.query;
-    let reviews;
+    const { userId } = req.params;
 
-    if (date) {
-      const selectedDate = new Date(date);
-      reviews = await Review.find({
-        mealDate: {
-          $gte: new Date(selectedDate.setHours(0, 0, 0, 0)),
-          $lt: new Date(selectedDate.setHours(23, 59, 59, 999))
-        }
-      }).populate('user', 'name email');
-    } else {
-      reviews = await Review.find({})
-        .sort({ createdAt: -1 })
-        .limit(50)
-        .populate('user', 'name email');
+    // Students can only access their own
+    if (req.user.role === 'student' && userId !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
     }
 
-    if (!reviews.length) {
-      return res.status(404).json({ success: false, message: 'No reviews found.' });
-    }
+    const reviews = await Review.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .populate('user', 'name email');
 
-    const summary = await summarizeReviews(reviews);
-    res.json({ success: true, data : summary });
+    res.json({ success: true, reviews });
   } catch (error) {
-    console.error('Summarize reviews error:', error);
+    console.error('Get reviews error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

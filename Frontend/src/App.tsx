@@ -29,12 +29,10 @@ function App() {
           try {
             const refreshToken = authService.getRefreshToken();
             if (refreshToken) {
-              const refreshResponse = await fetch('http://localhost:5000/api/auth/refresh', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ refreshToken }),
+              const refreshResponse = await authService.axiosInstance.post('/auth/refresh', {
+                refreshToken,
               });
-              const refreshData = await refreshResponse.json();
+              const refreshData = refreshResponse.data;
 
               if (refreshData.success) {
                 // Update tokens and set user
@@ -114,7 +112,7 @@ function App() {
         element={
           user ?
           <Navigate to="/dashboard" /> :
-          <StudentSignupPage />
+          <StudentSignupPage onLogin={handleLogin} />
         }
       />
       <Route

@@ -1,301 +1,303 @@
-DIGIMESS: A Comprehensive Mess Management System
+# 🍽️ DigiMess
 
-1. Project Overview
-   DIGIMESS is a web-based application designed to streamline mess operations for both students and administrators. It provides features for menu viewing, attendance tracking, feedback submission, and administrative controls.
-2. Getting Started
+A comprehensive web-based Mess Management System for students and administrators. DigiMess streamlines mess operations including meal attendance tracking, opt-out requests, rebate calculations, and review management with ML-powered sentiment analysis.
 
-## Prerequisites
+---
 
-- Node.js (version 16 or higher)
-- npm (comes with Node.js)
-- MongoDB (local installation or MongoDB Atlas account)
+## 🏗️ Tech Stack
 
-## Installation
+| Layer      | Technology                                      |
+| ---------- | ----------------------------------------------- |
+| Frontend   | React 19, TypeScript, Tailwind CSS 4, Vite 7    |
+| Backend    | Node.js, Express 5, JWT Authentication           |
+| Database   | MongoDB / Mongoose                               |
+| ML         | Keyword-based sentiment analysis (custom)        |
+| Email      | Nodemailer (Gmail SMTP)                          |
 
-1. Clone the repository:
+---
 
-   ```
-   git clone <repository-url>
-   cd digimess
-   ```
+## 📁 Project Structure
 
-2. Install backend dependencies:
+```
+DigiMess/
+├── Backend/
+│   ├── middleware/
+│   │   └── authMiddleware.js      # JWT verification & role-based access
+│   ├── ml/
+│   │   └── summarizer.js          # Review sentiment analysis engine
+│   ├── models/
+│   │   ├── MealAttendance.js      # Daily meal attendance records
+│   │   ├── OptOut.js              # Meal opt-out requests
+│   │   ├── PasswordResetToken.js  # Secure password reset tokens
+│   │   ├── Rebate.js              # Monthly rebate calculations
+│   │   ├── RefreshToken.js        # JWT refresh token storage
+│   │   ├── Review.js              # Meal reviews & ratings
+│   │   └── User.js                # User accounts (student/admin)
+│   ├── routes/
+│   │   ├── admin.js               # Admin dashboard, stats & management
+│   │   ├── auth.js                # Login, register, password reset, tokens
+│   │   ├── meals.js               # Meal attendance logging & history
+│   │   ├── optout.js              # Opt-out request & approval
+│   │   ├── rebate.js              # Rebate calculation & approval
+│   │   └── reviews.js             # Review submission & approval
+│   ├── .env.example               # Environment variable template
+│   ├── Procfile                   # Deployment process file
+│   ├── package.json
+│   ├── seed.js                    # Database seeder with sample data
+│   └── server.js                  # Express server entry point
+│
+├── Frontend/
+│   ├── public/                    # Static assets
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AdminDashboard.tsx      # Admin panel with stats & management
+│   │   │   ├── EditProfile.tsx         # User profile editor
+│   │   │   ├── ForgotPasswordPage.tsx  # Password reset request
+│   │   │   ├── LoginPage.tsx           # Admin login page
+│   │   │   ├── ResetPasswordPage.tsx   # Password reset form
+│   │   │   ├── StudentDashboard.tsx    # Student panel with all features
+│   │   │   ├── StudentLoginPage.tsx    # Student login page
+│   │   │   └── StudentSignupPage.tsx   # Student registration
+│   │   ├── services/
+│   │   │   ├── adminService.ts    # Admin API calls
+│   │   │   ├── apiService.ts      # Generic API helper
+│   │   │   ├── authService.ts     # Auth, tokens & interceptors
+│   │   │   ├── mealService.ts     # Meal attendance API
+│   │   │   ├── optoutService.ts   # Opt-out request API
+│   │   │   ├── rebateService.ts   # Rebate calculation API
+│   │   │   └── reviewService.ts   # Review submission API
+│   │   ├── types/
+│   │   │   └── User.ts           # TypeScript interfaces
+│   │   ├── App.tsx               # Root component with routing
+│   │   ├── App.css               # Application styles
+│   │   ├── index.css             # Global styles & Tailwind
+│   │   └── main.tsx              # React entry point
+│   ├── .env.example              # Frontend env template
+│   ├── index.html
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── vite.config.ts
+│
+├── UML Diagrams/                 # PlantUML architecture diagrams
+│   ├── Activity.puml
+│   ├── Class.puml
+│   ├── Sequence.puml
+│   └── UseCase.puml
+│
+├── .gitignore
+└── README.md
+```
 
-   ```
-   cd Backend
-   npm install
-   ```
+---
 
-3. Install frontend dependencies:
-   ```
-   cd ../Frontend
-   npm install
-   ```
+## 🚀 Getting Started
 
-## Environment Setup
+### Prerequisites
 
-1. Create a `.env` file in the `Backend` directory with the following variables:
+- **Node.js** v18 or higher ([download](https://nodejs.org/))
+- **npm** (comes with Node.js)
+- **MongoDB** — local installation or [MongoDB Atlas](https://www.mongodb.com/atlas) account
 
-   ```
-   MONGO_URI=mongodb://localhost:27017/digimess  # For local MongoDB
-   # OR for MongoDB Atlas: mongodb+srv://<username>:<password>@cluster.mongodb.net/digimess?retryWrites=true&w=majority
-   JWT_SECRET=your_jwt_secret_key_here
-   PORT=5000
-   ```
+### 1. Clone the Repository
 
-2. Ensure MongoDB is running locally (if using local MongoDB):
-   - Start MongoDB service on your system.
+```bash
+git clone <repository-url>
+cd DigiMess
+```
 
-## Running the Application
+### 2. Backend Setup
 
-1. Seed the database with sample data (optional, but recommended for testing):
+```bash
+cd Backend
+npm install
+```
 
-   ```
-   cd Backend
-   npm run seed
-   ```
+Create a `.env` file from the template:
 
-2. Start the backend server:
+```bash
+cp .env.example .env
+```
 
-   ```
-   npm run dev
-   ```
+Edit `.env` with your values:
 
-   The backend will run on `http://localhost:5000`.
+```env
+MONGO_URI=mongodb://localhost:27017/digimess
+JWT_SECRET=your_super_secret_jwt_key_here
+PORT=5000
+EMAIL_USER=your-gmail@gmail.com
+EMAIL_PASS=your-16-digit-app-password
+FRONTEND_URL=http://localhost:5173
+GOOGLE_CLIENT_ID=your_google_client_id_here
+```
 
-3. In a new terminal, start the frontend:
-   ```
-   cd ../Frontend
-   npm run dev
-   ```
-   The frontend will run on `http://localhost:5173`.
+> **Note:** For `EMAIL_PASS`, generate a [Google App Password](https://support.google.com/accounts/answer/185833) if using Gmail with 2FA enabled.
+> **Note:** For `GOOGLE_CLIENT_ID`, generate a Client ID from the Google Cloud Console (APIs & Services -> Credentials).
 
-## Demo Credentials
+### 3. Frontend Setup
 
-After seeding, you can log in with the following accounts:
+```bash
+cd ../Frontend
+npm install
+```
 
-- **Admin**: admin@digimess.com / admin123
-- **Students**: student1@digimess.com to student5@digimess.com / student123
+Optionally create a `.env` file:
 
-3. Team Roles and Responsibilities
-   Role
-   Team Members
-   Frontend Developer
-   Devansh Rai, Krish Dhaked, Amar Singh
-   Backend Developer
-   Himanshu Vitthalani, Mayank Jha
-   Database Designer
-   Devansh Rai, Aryan Shrivastava
-   Tester
-   Himanshu Vitthalani, Krish Dhaked
-   Model Training (ML)
-   Mayank Jha, Himanshu Vitthalani
-   Documentation Specialist
-   Aryan Shrivastava, Amar Singh
+```bash
+cp .env.example .env
+```
 
-4. Tools & Technologies
-   Frontend: React, Tailwind CSS, TypeScript
-   Backend: Node.js, Express.js, JWT Authentication
-   Database: MongoDB / MySQL
-   Hosting:
-   Frontend: Vercel
-   Backend: Render
-   Database: MongoDB Atlas (for MongoDB) / PlanetScale (for MySQL)
-   Extras: GitHub, Firebase
-5. User Screens Layout
-   4.1. Common Screens
-   4.1.1. Login Screen
-   Purpose: Authenticate users (students/admins).
-   Fields: Email, Password.
-   Actions: Login button, Forgot Password (links to password reset).
-   Backend Flow: Verifies credentials and returns a JWT token upon successful authentication.
-   4.1.2. Profile Screen
-   Purpose: Allow users to view and update personal details.
-   Sections:
-   Name, Email, Contact Information
-   Password Change option
-   View Bill History
-   Attendance History
-   4.2. Student Screens
-   4.2.1. Student Dashboard
-   Purpose: Main landing page for students after login.
-   Widgets/Sections:
-   Today’s Menu (Breakfast/Lunch/Dinner)
-   Monthly Attendance Summary
-   Pending Bill Amount
-   Quick Links: Give Feedback, Pay Bill, View Complaints
-   4.2.2. Menu Screen
-   Purpose: Display weekly/daily mess menu.
-   Features:
-   Tabs for Breakfast, Lunch, Dinner.
-   Date-wise menu navigation.
-   4.2.3. Attendance Screen
-   Purpose: Students can check their meal attendance records.
-   Features:
-   Calendar view indicating presence/absence.
-   Option to download attendance report.
-   4.2.4. Complaint & Feedback Screen
-   Purpose: Enable students to submit feedback or report issues.
-   Fields: Complaint text (textarea), Image upload (optional).
-   ML Integration: Complaint sentiment is automatically classified (Positive/Negative/Neutral).
-   History Section: Lists submitted complaints with their current status (pending/resolved).
-   4.3. Admin Screens
-   4.3.1. Admin Dashboard
-   Purpose: Provide an overview of mess activities for administrators.
-   Widgets/Sections:
-   Total Registered Students
-   Daily Attendance Summary
-   Complaints (with sentiment filter)
-   Quick link for Menu Updates
-   4.3.2. User Management Screen
-   Purpose: Manage student records.
-   Features:
-   List of students with search and filter capabilities.
-   Functions to Add, Edit, and Delete student accounts.
-   4.3.3. Menu Management Screen
-   Purpose: Allow administrators to add and update the mess menu.
-   Fields: Date, Meal type, Menu items.
-   Actions: Add New Menu, Edit/Delete existing menu items.
-   4.3.4. Attendance Reports Screen
-   Purpose: Track student attendance and generate reports.
-   Features:
-   Table view displaying student names and meal attendance.
-   Filter by date range.
-   Export functionality (CSV/PDF).
-   4.3.5. Complaint Management Screen
-   Purpose: Administrators resolve complaints and feedback.
-   Features:
-   Complaint list with Sentiment Analysis Tag (from Hugging Face).
-   Option to mark complaints as resolved.
-   View complaint history.
-6. Backend Design Layout & Tools
-   5.1. System Architecture
-   The DigiMess system will adhere to a 3-tier architecture:
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+```
 
-Frontend (Client Layer): A React.js web application through which students and administrators interact.
-Backend (Application Layer): A Node.js with Express.js REST API responsible for handling business logic, authentication, and data validations.
-Database (Data Layer): MySQL or MongoDB, storing all mess-related data including users, menu information, attendance records, bills, and complaints.
-5.2. Logic Behind Screens
-Login Screen:
-User inputs email and password.
-Backend validates credentials against the database.
-If valid, a JWT token is generated and returned to the frontend.
-If invalid, an error response is sent.
-Menu Screen (Daily/Weekly Mess Menu):
-Backend fetches menu items from the designated menu table/collection.
-A JSON response is sent to the frontend for display.
-Complaint/Feedback Screen:
-User submits their complaint.
-Backend stores the complaint in the complaints table with an initial status of "Pending".
-Admin Dashboard:
-Backend retrieves various reports such as attendance percentages, payment summaries, and menu updates.
-Provides CRUD (Create, Read, Update, Delete) operations for menu and user management.
-5.3. Backend Flow (User Interaction → Processing)
-Example: Login Verification
+### 4. Database Seeding (Automatic)
 
-User enters credentials on the frontend.
-A request is sent to the backend API: /api/auth/login.
-Backend Processing:
-Validates input.
-Finds the user in the database.
-Compares the provided password using bcrypt for security.
-If credentials are valid, a JWT token is generated and sent to the frontend.
-Otherwise, an error message is returned. 6. Database Design & Table Description
-6.1. Database Tool
-Technology: MySQL (Relational Database)
-Reason: Chosen for structured data (users, payments, attendance) which benefits from easier querying with joins.
-Hosting: Locally via MySQL Workbench or in the cloud using PlanetScale.
-6.2. Database Schema (ER Model Overview)
-Entities:
+Seeding is fully automated! There is no separate `npm run seed` script or step required.
+When you start the Backend server for the first time, it automatically checks if an admin user exists. If not, it will seed sample data (users, attendance records, opt-outs, rebates, and reviews) automatically. Subsequent server startups will silently skip seeding.
 
-Users: Represents both students and administrators.
-Menu: Stores daily food items.
-Attendance: Tracks daily meal attendance for students.
-Complaints: Records student feedback and issues.
+### 5. Start the Application
 
-Relationships:
+**Terminal 1 — Backend:**
 
-Users → Attendance: One-to-Many (One user can have many attendance records).
-Users → Complaints: One-to-Many (One user can submit many complaints).
-Admin (Users) → Menu: One-to-Many (One admin can create/update many menu entries).
-6.3. Tables Description
-6.3.1. Users Table
-Table Name: users
-Attributes:
-user_id INT AUTO_INCREMENT (Primary Key)
-name VARCHAR(100)
-email VARCHAR(100) UNIQUE
-password VARCHAR(255)
-role ENUM(‘student’, ‘admin’)
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-Primary Key: user_id
-Relationships: Connected with attendance, payments (if implemented), and complaints tables.
-6.3.2. Menu Table
-Table Name: menu
-Attributes:
-menu_id INT AUTO_INCREMENT (Primary Key)
-date DATE
-meal_type ENUM(‘breakfast’, ‘lunch’, ‘dinner’)
-items TEXT (Comma-separated list of dishes)
-created_by INT (Foreign Key referencing users.user_id for the admin who created the menu)
-Primary Key: menu_id
-Foreign Key: created_by references users(user_id).
+```bash
+cd Backend
+npm run dev
+```
 
-6.3.3. Attendance Table
+The API server will start on `http://localhost:5000`.
 
-Table Name: attendance
+**Terminal 2 — Frontend:**
 
-Attributes:
-attendance_id INT AUTO_INCREMENT (Primary Key)
-user_id INT (Foreign Key referencing users.user_id)
-date DATE
-meal_type ENUM(‘breakfast’, ‘lunch’, ‘dinner’)
-status ENUM(‘present’, ‘absent’)
-Primary Key: attendance_id
-Foreign Key: user_id references users(user_id).Complaints Table
+```bash
+cd Frontend
+npm run dev
+```
 
-Table Name: complaints
+The app will open at `http://localhost:5173`.
 
-Attributes:
-complaint_id INT AUTO_INCREMENT (Primary Key)
-user_id INT (Foreign Key referencing users.user_id)
-description TEXT
-status ENUM(‘pending’, ‘resolved’) DEFAULT ‘pending’
-sentiment ENUM(‘positive’, ‘negative’, ‘neutral’)
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-Primary Key: complaint_id
-Foreign Key: user_id references users(user_id).ML Integration Explanation7.1. Full Process Example: Complaint & Feedback Handling with Sentiment AnalysisFrontend (React.js)
+---
 
-7. ML Integration Explanation
-   7.1. Full Process Example: Complaint & Feedback Handling with Sentiment
+## 🔑 Demo Credentials
 
-AnalysisFrontend (React.js)
-Student writes a complaint/feedback (e.g., "The food quality is bad today").
-On submitting the form, the complaint text is sent via Axios POST request to the backend API /api/complaints/add.
-Backend (Node.js + Express + Hugging Face/Transformer ML)
-Backend stores the complaint in the complaints table.
-Additionally, the backend passes the complaint text to a Hugging Face Sentiment Analysis model (e.g., "distilbert-base-uncased-finetuned-sst-2-english").
-The ML model returns sentiment → Positive / Neutral / Negative.
-Backend saves this sentiment result along with the complaint in the database.
-Database (MySQL)
-complaints table gets updated with:
-Complaint text
-Student ID (FK)
-Status (pending/resolved)
-Sentiment label (Positive/Negative/Neutral)
-Admin Dashboard (Frontend)
-When an admin views complaints, the system shows not only the complaint text but also the sentiment analysis result (e.g., red badge = negative, green badge = positive).
-This helps the mess manager/admin quickly filter urgent complaints (e.g., multiple negative complaints on the same day → alert).
-7.2. Flow of Information with ML
-User Input → Complaint submitted.
-Processing (Backend + ML Model) →
-Input text sent to Hugging Face model.
-Sentiment prediction generated.
-Database → Complaint stored with sentiment classification.
-Frontend (Admin View) → Complaints listed with sentiment color coding for quick action.
-7.3. Tools/Technologies for ML Integration
-Hugging Face Transformers Library (pip install transformers)
-Pretrained Model: distilbert-base-uncased-finetuned-sst-2-english (for sentiment classification)
-Node.js ↔ Python Bridge:
-Option 1: Use a Python microservice (Flask/FastAPI) running the Hugging Face model. Backend (Node.js) makes API calls to this service.
-Option 2: Use Hugging Face Inference API directly from Node.js with an API key (no need to host your own ML).
+After running the seed script:
+
+| Role    | Email                        | Password     |
+| ------- | ---------------------------- | ------------ |
+| Admin   | `admin@digimess.com`         | `admin123`   |
+| Student | `student1@digimess.com`      | `student123` |
+| Student | `student2@digimess.com`      | `student123` |
+| Student | `student3@digimess.com`      | `student123` |
+| Student | `student4@digimess.com`      | `student123` |
+| Student | `student5@digimess.com`      | `student123` |
+
+---
+
+## 📡 API Reference
+
+All endpoints are prefixed with `/api`. Protected routes require a `Bearer` token in the `Authorization` header.
+
+### Authentication (`/api/auth`)
+
+| Method | Endpoint            | Auth     | Description                     |
+| ------ | ------------------- | -------- | ------------------------------- |
+| POST   | `/login`            | Public   | Login with email & password     |
+| POST   | `/google`           | Public   | Google OAuth Login/Registration |
+| POST   | `/register`         | Public   | Register a new user             |
+| POST   | `/forgot-password`  | Public   | Request password reset email    |
+| POST   | `/reset-password`   | Public   | Reset password with token       |
+| GET    | `/me`               | Required | Get current user profile        |
+| PUT    | `/update-profile`   | Required | Update name, email, or password |
+| POST   | `/refresh`          | Public   | Refresh access token            |
+| POST   | `/logout`           | Required | Invalidate refresh token        |
+
+### Meals (`/api/meals`) — Requires Auth
+
+| Method | Endpoint              | Role    | Description                |
+| ------ | --------------------- | ------- | -------------------------- |
+| POST   | `/attendance`         | Student | Log daily meal attendance  |
+| GET    | `/:userId/history`    | Any     | Get attendance history     |
+
+### Opt-Outs (`/api/optout`) — Requires Auth
+
+| Method | Endpoint          | Role    | Description              |
+| ------ | ----------------- | ------- | ------------------------ |
+| POST   | `/request`        | Student | Submit opt-out request   |
+| PUT    | `/:id/approve`    | Admin   | Approve/reject opt-out   |
+| GET    | `/:userId`        | Any     | Get user's opt-outs      |
+
+### Rebates (`/api/rebate`) — Requires Auth
+
+| Method | Endpoint               | Role    | Description              |
+| ------ | ---------------------- | ------- | ------------------------ |
+| GET    | `/:userId/calculate`   | Any     | Calculate monthly rebate |
+| PUT    | `/:id/approve`         | Admin   | Approve/reject rebate    |
+| GET    | `/:userId`             | Any     | Get rebate history       |
+
+### Reviews (`/api/reviews`) — Requires Auth
+
+| Method | Endpoint          | Role    | Description              |
+| ------ | ----------------- | ------- | ------------------------ |
+| POST   | `/submit`         | Student | Submit a meal review     |
+| PUT    | `/:id/approve`    | Admin   | Approve/reject review    |
+| GET    | `/:userId`        | Any     | Get user's reviews       |
+
+### Admin (`/api/admin`) — Requires Admin Role
+
+| Method | Endpoint            | Description                     |
+| ------ | ------------------- | ------------------------------- |
+| GET    | `/stats`            | Dashboard statistics            |
+| GET    | `/optouts`          | All opt-out requests            |
+| GET    | `/rebates`          | All rebate records              |
+| GET    | `/reviews`          | All reviews                     |
+| GET    | `/reviews/summary`  | ML-powered review summary       |
+| GET    | `/attendance`       | Recent attendance records       |
+
+---
+
+## 🧠 ML — Review Summarization
+
+The backend includes a keyword-based sentiment analysis engine (`Backend/ml/summarizer.js`) that:
+
+1. Analyzes review comments for positive, negative, and neutral keywords
+2. Determines dominant sentiment with emoji indicators (🟢 🟡 🔴)
+3. Extracts top frequent words for dynamic summaries
+4. Computes average ratings across reviews
+
+Admins can view the AI-generated summary via the dashboard or the `/api/admin/reviews/summary` endpoint.
+
+---
+
+## 🏛️ Architecture
+
+```
+┌──────────────┐     HTTP/REST     ┌──────────────────┐     Mongoose     ┌──────────┐
+│   React SPA  │ ◄──────────────►  │  Express API     │ ◄─────────────►  │ MongoDB  │
+│  (Vite + TS) │                   │  (Node.js)       │                  │          │
+│              │                   │                  │                  │          │
+│  • Auth UI   │                   │  • JWT Auth      │                  │  Users   │
+│  • Dashboard │                   │  • Role Guards   │                  │  Meals   │
+│  • Forms     │                   │  • ML Summarizer │                  │  OptOuts │
+│  • Charts    │                   │  • Email (SMTP)  │                  │  Rebates │
+└──────────────┘                   └──────────────────┘                  │  Reviews │
+                                                                        └──────────┘
+```
+
+---
+
+## 👥 Team
+
+| Role                   | Members                                |
+| ---------------------- | -------------------------------------- |
+| Frontend Developer     | Devansh Rai, Krish Dhaked, Amar Singh  |
+| Backend Developer      | Himanshu Vitthalani, Mayank Jha        |
+| Database Designer      | Devansh Rai, Aryan Shrivastava         |
+| Tester                 | Himanshu Vitthalani, Krish Dhaked       |
+| Model Training (ML)    | Mayank Jha, Himanshu Vitthalani        |
+| Documentation          | Aryan Shrivastava, Amar Singh          |
+
+---
+
+## 📄 License
+
+ISC

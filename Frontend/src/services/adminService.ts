@@ -1,5 +1,14 @@
 import { authService } from './authService';
 import type { ApiResponse, User, AdminStatsResponse, OptOut, Rebate, Review, MealAttendance } from '../types/User';
+import axios from 'axios';
+
+// Helper utility to safely extract and format backend messages from an unknown error
+const handleAdminError = (error: unknown, fallbackMessage: string): never => {
+  if (axios.isAxiosError(error)) {
+    throw new Error(error.response?.data?.message || fallbackMessage);
+  }
+  throw new Error(fallbackMessage);
+};
 
 export const adminService = {
   async getAllUsers(): Promise<ApiResponse<User[]>> {
@@ -8,7 +17,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get users error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to fetch user directory');
     }
   },
 
@@ -18,7 +27,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Update user error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to update user configurations');
     }
   },
 
@@ -28,7 +37,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Delete user error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to remove user from database');
     }
   },
 
@@ -38,7 +47,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Create user error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to register new profile');
     }
   },
 
@@ -48,7 +57,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get stats error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to extract system performance metrics');
     }
   },
 
@@ -58,7 +67,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get opt-outs error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to parse opt-out logs');
     }
   },
 
@@ -68,7 +77,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get rebates error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to load transaction rebate ledgers');
     }
   },
 
@@ -78,7 +87,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get reviews error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to read feedback metrics');
     }
   },
 
@@ -88,7 +97,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get attendance error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to pull operational meal charts');
     }
   },
 
@@ -98,7 +107,7 @@ export const adminService = {
       return response.data;
     } catch (error: unknown) {
       console.error('Get review summary error:', error);
-      throw error;
+      return handleAdminError(error, 'Failed to compile analysis summary');
     }
   }
 };

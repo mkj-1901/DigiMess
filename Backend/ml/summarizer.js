@@ -1,5 +1,37 @@
 // Backend/ml/summarizer.js
 
+let pipeline;
+
+async function initTransformers() {
+  if (!pipeline) {
+    // Dynamically import to ensure compatibility
+    const transformers = await import('@xenova/transformers');
+    pipeline = transformers.pipeline;
+  }
+}
+
+// Cache the pipeline instances to avoid reloading the model for every request
+let summarizerPipelineInstance = null;
+let sentimentPipelineInstance = null;
+
+async function getSummarizer() {
+  await initTransformers();
+  if (!summarizerPipelineInstance) {
+    // Xenova/distilbart-cnn-6-6 is optimal for fast local summarization
+    summarizerPipelineInstance = await pipeline('summarization', 'Xenova/distilbart-cnn-6-6');
+  }
+  return summarizerPipelineInstance;
+}
+
+async function getSentimentAnalyzer() {
+  await initTransformers();
+  if (!sentimentPipelineInstance) {
+    // Fast sentiment analysis model
+    sentimentPipelineInstance = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
+  }
+  return sentimentPipelineInstance;
+}
+
 exports.summarizeReviews = async (reviews = []) => {
   try {
     // Filter valid reviews
@@ -19,102 +51,44 @@ exports.summarizeReviews = async (reviews = []) => {
       validReviews.reduce((s, r) => s + (r.rating || 0), 0) /
       validReviews.length;
 
-    // Define keyword categories
-    const keywords = {
-      positive: [
-        "good",
-        "tasty",
-        "nice",
-        "great",
-        "excellent",
-        "delicious",
-        "amazing",
-        "fresh",
-      ],
-      negative: [
-        "bad",
-        "poor",
-        "oily",
-        "cold",
-        "stale",
-        "horrible",
-        "worst",
-        "bland",
-      ],
-      neutral: ["average", "okay", "fine", "decent", "normal"],
-    };
+    // Combine comments. Truncate if too long to prevent token limit issues.
+    const combinedComments = validReviews.map(r => r.comment.trim()).join(". ");
+    const truncatedTextForSummary = combinedComments.slice(0, 2000); 
 
-    // Count keyword mentions
-    const counts = { positive: 0, negative: 0, neutral: 0 };
-    const wordFreq = {};
-
-    validReviews.forEach((r) => {
-      const words = r.comment.toLowerCase().match(/\b[a-z]+\b/g) || [];
-      words.forEach((w) => {
-        wordFreq[w] = (wordFreq[w] || 0) + 1;
-        for (const [cat, list] of Object.entries(keywords)) {
-          if (list.includes(w)) counts[cat]++;
-        }
-      });
+    // Run abstractive summarization inference
+    const summarizer = await getSummarizer();
+    const summaryResult = await summarizer(truncatedTextForSummary, {
+      max_new_tokens: 50,
+      min_new_tokens: 10,
     });
+    
+    // Extracted summary
+    let generatedSummary = summaryResult[0]?.summary_text || "Unable to generate abstractive summary.";
+    // Capitalize first letter
+    generatedSummary = generatedSummary.charAt(0).toUpperCase() + generatedSummary.slice(1);
 
-    // Determine dominant sentiment
-    const dominant =
-      counts.positive > counts.negative && counts.positive >= counts.neutral
-        ? "positive"
-        : counts.negative > counts.positive && counts.negative >= counts.neutral
-        ? "negative"
-        : "neutral";
-
-    // Select emoji label
+    // Run sentiment analysis on the text to get overall vibe
+    const sentimentAnalyzer = await getSentimentAnalyzer();
+    // Sentiment models usually take max 512 tokens
+    const truncatedTextForSentiment = combinedComments.slice(0, 1000);
+    const sentimentResult = await sentimentAnalyzer(truncatedTextForSentiment);
+    const sentimentLabel = sentimentResult[0]?.label || "NEUTRAL";
+    
+    // Choose appropriate emoji based on the sentiment
     const sentimentEmoji =
-      dominant === "positive"
+      sentimentLabel === "POSITIVE"
         ? "🟢 Positive"
-        : dominant === "negative"
+        : sentimentLabel === "NEGATIVE"
         ? "🔴 Negative"
         : "🟡 Mixed";
-
-    // Extract top 3 frequent words to make summary dynamic
-    const topWords = Object.entries(wordFreq)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([w]) => w)
-      .join(", ") || "varied";
-
-    // Dynamic summary templates
-    const templates = {
-      positive: [
-        `Students frequently used words like ${topWords} to describe their meal, showing high satisfaction.`,
-        `Overall sentiment was positive, with mentions of ${topWords} reflecting students' enjoyment.`,
-        `Feedback highlighted ${topWords}, indicating that most students were pleased with the meal quality.`,
-      ],
-      neutral: [
-        `Feedback was balanced, with words such as ${topWords} suggesting a mix of likes and dislikes.`,
-        `Students had mixed opinions — comments mentioned ${topWords}, indicating room for improvement.`,
-        `Overall, responses were moderate with mentions like ${topWords}, showing an average experience.`,
-      ],
-      negative: [
-        `Many reviews included negative terms like ${topWords}, indicating dissatisfaction among students.`,
-        `Students criticized the meal, using words such as ${topWords} to describe poor quality.`,
-        `The overall tone was negative, with ${topWords} appearing often in feedback.`,
-      ],
-    };
-
-    // Choose one randomly for freshness
-    const summary =
-      templates[dominant][
-        Math.floor(Math.random() * templates[dominant].length)
-      ];
-
-    const keywordSummary = `(${counts.positive} positive, ${counts.neutral} neutral, ${counts.negative} negative mentions)`;
 
     // Final formatted output
     return {
       averageRating: parseFloat(avgRating.toFixed(2)),
-      summaryText: `${sentimentEmoji}: ${summary} ${keywordSummary}`,
+      summaryText: `${sentimentEmoji}: ${generatedSummary}`,
     };
   } catch (err) {
-    console.error("❌ Keyword summarization error:", err);
-    return { averageRating: 0, summaryText: "Error generating summary." };
+    console.error("❌ Model inference error:", err);
+    return { averageRating: 0, summaryText: "Error generating summary using AI model." };
   }
 };

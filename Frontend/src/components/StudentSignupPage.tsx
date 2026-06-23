@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { authService } from "../services/authService";
 
 interface SignupData {
@@ -8,7 +9,11 @@ interface SignupData {
   password: string;
 }
 
-export const StudentSignupPage: React.FC = () => {
+interface StudentSignupPageProps {
+  onLogin: (user: any) => void;
+}
+
+export const StudentSignupPage: React.FC<StudentSignupPageProps> = ({ onLogin }) => {
   const [userData, setUserData] = useState<SignupData>({
     name: "",
     email: "",
@@ -129,6 +134,40 @@ export const StudentSignupPage: React.FC = () => {
             >
               {loading ? "Creating account..." : "Sign up"}
             </button>
+          </div>
+
+          {/* Divider */}
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
+
+          {/* Google Login Button */}
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  setLoading(true);
+                  setError("");
+                  try {
+                    const response = await authService.googleLogin(credentialResponse.credential);
+                    if (response.success && response.user) {
+                      onLogin(response.user);
+                    } else {
+                      setError(response.message || "Google signup failed");
+                    }
+                  } catch (err) {
+                    setError("An error occurred during Google signup");
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+              }}
+              onError={() => {
+                setError("Google Signup failed");
+              }}
+            />
           </div>
 
           {/* Login Link */}

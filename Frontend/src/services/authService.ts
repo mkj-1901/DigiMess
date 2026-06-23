@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import type { User, LoginCredentials, AuthResponse } from '../types/User';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Create axios instance
 const axiosInstance: AxiosInstance = axios.create({
@@ -12,11 +12,18 @@ const axiosInstance: AxiosInstance = axios.create({
   },
 });
 
+// Helper utility to safely wipe local auth storage without relying on uninitialized authService
+const clearLocalAuthData = () => {
+  localStorage.removeItem('user');
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+};
+
 // Request interceptor to attach access token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -30,12 +37,14 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Trigger only on 401 and prevent infinite recursion loops using _retry flag
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
+          // Use vanilla axios instance to avoid sending expired auth headers to the refresh endpoint
           const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refreshToken,
           });
@@ -47,16 +56,17 @@ axiosInstance.interceptors.response.use(
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', newRefreshToken);
 
-            // Retry original request with new token
+            // Retry original request with new token attached
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             return axiosInstance(originalRequest);
           }
         }
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
-        // If refresh fails, logout user
-        authService.logout();
-        window.location.href = '/'; // Redirect to login
+        
+        // FIX: Replaced authService.logout() with clean manual swipe to avoid circular reference crashes
+        clearLocalAuthData();
+        window.location.href = '/'; 
       }
     }
 
@@ -71,7 +81,6 @@ export const authService = {
       const data = response.data;
 
       if (data.success && data.user) {
-        // Store user and tokens in localStorage
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
@@ -103,7 +112,6 @@ export const authService = {
       const data = response.data;
 
       if (data.success) {
-        // Store user and tokens in localStorage (auto-login after signup)
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
@@ -136,10 +144,7 @@ export const authService = {
     } catch (error) {
       console.error('Logout API error:', error);
     } finally {
-      // Clear localStorage regardless of API call success
-      localStorage.removeItem('user');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      clearLocalAuthData();
     }
   },
 
@@ -165,7 +170,6 @@ export const authService = {
     return user !== null && token !== null;
   },
 
-  // Validate token expiry (basic check, can be enhanced)
   isTokenValid(): boolean {
     const token = this.getAccessToken();
     if (!token) return false;
@@ -179,9 +183,50 @@ export const authService = {
     }
   },
 
-  async resetPassword(email: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+  async googleLogin(credential: string): Promise<AuthResponse> {
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, { email, newPassword });
+      const response = await axiosInstance.post('/auth/google', { credential });
+      const data = response.data;
+
+      if (data.success && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        return {
+          success: true,
+          user: data.user
+        };
+      } else {
+        return {
+          success: false,
+          message: data.message || 'Google login failed'
+        };
+      }
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Network error occurred'
+      };
+    }
+  },
+
+  async forgotPassword(email: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await axiosInstance.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to send reset link'
+      };
+    }
+  },
+
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await axiosInstance.post('/auth/reset-password', { token, newPassword });
       return response.data;
     } catch (error: any) {
       console.error('Reset password error:', error);
@@ -192,15 +237,12 @@ export const authService = {
     }
   },
 
-
-
   async updateProfile(userData: { name?: string; email?: string; password?: string }): Promise<{ success: boolean; user?: User; message?: string }> {
     try {
       const response = await axiosInstance.put('/auth/update-profile', userData);
       const data = response.data;
 
       if (data.success && data.user) {
-        // Update stored user data
         localStorage.setItem('user', JSON.stringify(data.user));
         return {
           success: true,
@@ -221,6 +263,5 @@ export const authService = {
     }
   },
 
-  // Axios instance for other services to use
   axiosInstance,
 };

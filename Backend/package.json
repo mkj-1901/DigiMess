@@ -1,28 +1,33 @@
 {
-  "name": "backend",
+  "name": "digimess-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Backend API for DigiMess — a comprehensive mess management system",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "seed": "node seed.js",
     "start": "node server.js"
   },
-  "keywords": [],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mess",
+    "management",
+    "digimess"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
+    "@xenova/transformers": "^2.17.2",
     "axios": "^1.13.2",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
-    "nodemailer": "^7.0.10",
-    "openai": "^6.8.1",
-    "sentiment": "^5.0.2"
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

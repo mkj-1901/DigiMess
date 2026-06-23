@@ -217,8 +217,12 @@ router.post('/forgot-password', async (req, res) => {
     });
     await resetTokenDoc.save();
 
+    const protocol = req.protocol; 
+    const host = req.get('host');
+    const baseUrl = `${protocol}://${host}`;
+    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
+
     // Send email
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,

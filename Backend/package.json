@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "Backend API for DigiMess — a comprehensive mess management system",
   "main": "server.js",
+  "type": "commonjs",
   "scripts": {
-    "dev": "nodemon start.js",
-    "start": "node start.js"
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18.0.0"

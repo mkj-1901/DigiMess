@@ -45,21 +45,46 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center animate-fade-in bg-gradient-to-br from-[#238548] to-[#a6efc2]">
-      <div className="w-full max-w-md card p-8 animate-slide-in">
+    <div
+      className="min-h-screen w-screen flex items-center justify-center animate-fade-in relative overflow-hidden"
+      style={{ background: "var(--bg-primary)" }}
+    >
+      {/* Background orbs */}
+      <div
+        className="absolute top-1/3 left-1/4 w-80 h-80 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(129,140,248,0.1) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute bottom-1/3 right-1/4 w-64 h-64 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%)" }}
+      />
+
+      <div
+        className="w-full max-w-md p-8 animate-slide-in relative z-10"
+        style={{
+          background: "var(--bg-surface)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "var(--radius-xl)",
+        }}
+      >
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mb-4">
-            <img
-              src="/favicon.svg"
-              alt="DigiMess Logo"
-              className="mx-auto h-12 w-12"
-            />
+            <div
+              className="mx-auto w-14 h-14 rounded-xl flex items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, var(--primary-color), var(--accent-color))",
+                boxShadow: "0 4px 20px rgba(129, 140, 248, 0.3)",
+              }}
+            >
+              <span className="text-white text-2xl font-bold">D</span>
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
             Welcome to DigiMess
           </h2>
-          <p className="text-gray-600">Sign in to your account</p>
+          <p style={{ color: "var(--text-secondary)" }}>Sign in to your account</p>
         </div>
 
         {/* Form */}
@@ -67,7 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           <div className="space-y-4">
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
                 Email Address
               </label>
               <input
@@ -83,7 +108,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
                 Password
               </label>
               <input
@@ -120,7 +145,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             >
               {loading ? (
                 <>
-                  <div className="spinner mr-2"></div>
+                  <div className="spinner mr-2" style={{ width: 20, height: 20 }}></div>
                   Signing in...
                 </>
               ) : (
@@ -136,9 +161,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
           {/* Divider */}
           <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow" style={{ borderTop: "1px solid var(--border-color)" }}></div>
+            <span className="flex-shrink mx-4 text-sm" style={{ color: "var(--text-muted)" }}>or</span>
+            <div className="flex-grow" style={{ borderTop: "1px solid var(--border-color)" }}></div>
           </div>
 
           {/* Google Login Button */}
@@ -168,26 +193,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             />
           </div>
 
-          {/* Demo Credentials */}
-          {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
-            <div className="text-xs text-blue-800 space-y-1">
-              <div><strong>Admin:</strong> admin@digimess.com / admin123</div>
-              <div><strong>Student:</strong> student@digimess.com / student123</div>
-            </div>
-          </div> */}
-
           {/* Forgot Password and Student Signup Links */}
           <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              <Link to="/forgot-password" className="font-medium transition-colors" style={{ color: "var(--primary-color)" }}>
                 Forgot your password?
               </Link>
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
               New student?{" "}
-              <Link to="/student/signup" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link to="/student/signup" className="font-medium transition-colors" style={{ color: "var(--primary-color)" }}>
                 Create an account
+              </Link>
+            </p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              <Link to="/home" className="font-medium transition-colors hover:underline" style={{ color: "var(--text-muted)" }}>
+                ← Back to Home
               </Link>
             </p>
           </div>

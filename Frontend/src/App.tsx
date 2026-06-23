@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { LandingPage } from './components/LandingPage';
 import { LoginPage } from './components/LoginPage';
 import { StudentLoginPage } from './components/StudentLoginPage';
 import { StudentSignupPage } from './components/StudentSignupPage';
@@ -67,16 +68,28 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+        <div className="flex flex-col items-center space-y-4">
+          <div
+            className="w-12 h-12 rounded-full border-2 border-t-transparent animate-spin"
+            style={{ borderColor: 'var(--primary-color)', borderTopColor: 'transparent' }}
+          />
+          <p style={{ color: 'var(--text-muted)' }} className="text-sm">Loading DigiMess...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <Routes>
+      {/* Landing page — entry point */}
       <Route
         path="/"
+        element={<LandingPage user={user} onLogout={handleLogout} />}
+      />
+      {/* Login routes */}
+      <Route
+        path="/login"
         element={
           user ?
           <Navigate to="/dashboard" /> :

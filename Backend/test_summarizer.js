@@ -1,3 +1,5 @@
+process.env.ORT_LOG_SEVERITY_LEVEL = '4';
+process.env.ORT_LOG_LEVEL = 'fatal';
 const { summarizeReviews } = require('./ml/summarizer.js');
 
 async function test() {

@@ -55,14 +55,37 @@ export const StudentSignupPage: React.FC<StudentSignupPageProps> = ({ onLogin })
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div
+      className="min-h-screen w-screen flex items-center justify-center animate-fade-in relative overflow-hidden"
+      style={{ background: "var(--bg-primary)" }}
+    >
+      {/* Background orbs */}
+      <div
+        className="absolute top-1/3 left-1/4 w-72 h-72 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute bottom-1/3 right-1/4 w-56 h-56 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(129,140,248,0.08) 0%, transparent 70%)" }}
+      />
+
+      <div
+        className="w-full max-w-md p-8 animate-slide-in relative z-10"
+        style={{
+          background: "var(--bg-surface)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "var(--radius-xl)",
+        }}
+      >
         {/* Header */}
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Student Signup for DigiMess
+          <h2 className="text-3xl font-extrabold" style={{ color: "var(--text-primary)" }}>
+            Create Account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">Create your student account</p>
+          <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Sign up as a student to get started
+          </p>
         </div>
 
         {/* Form */}
@@ -70,58 +93,52 @@ export const StudentSignupPage: React.FC<StudentSignupPageProps> = ({ onLogin })
           <div className="space-y-4">
             {/* Name */}
             <input
-              id="name"
+              id="signup-name"
               name="name"
               type="text"
               required
               placeholder="Full Name"
               value={userData.name}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                        placeholder-gray-400 text-gray-900 focus:outline-none 
-                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="form-input"
             />
 
             {/* Email */}
             <input
-              id="email"
+              id="signup-email"
               name="email"
               type="email"
               required
               placeholder="Email address"
               value={userData.email}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                        placeholder-gray-400 text-gray-900 focus:outline-none 
-                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="form-input"
             />
 
             {/* Password */}
             <input
-              id="password"
+              id="signup-password"
               name="password"
               type="password"
               required
               placeholder="Password"
               value={userData.password}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                        placeholder-gray-400 text-gray-900 focus:outline-none 
-                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="form-input"
             />
           </div>
 
           {/* Error */}
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-center">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="error-message text-center">
+              <p className="text-sm">{error}</p>
             </div>
           )}
 
           {/* Success */}
           {success && (
-            <div className="rounded-md bg-green-50 p-3 text-center">
-              <p className="text-sm text-green-700">{success}</p>
+            <div className="success-message text-center">
+              <p className="text-sm">{success}</p>
             </div>
           )}
 
@@ -138,9 +155,9 @@ export const StudentSignupPage: React.FC<StudentSignupPageProps> = ({ onLogin })
 
           {/* Divider */}
           <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow" style={{ borderTop: "1px solid var(--border-color)" }}></div>
+            <span className="flex-shrink mx-4 text-sm" style={{ color: "var(--text-muted)" }}>or</span>
+            <div className="flex-grow" style={{ borderTop: "1px solid var(--border-color)" }}></div>
           </div>
 
           {/* Google Login Button */}
@@ -171,11 +188,16 @@ export const StudentSignupPage: React.FC<StudentSignupPageProps> = ({ onLogin })
           </div>
 
           {/* Login Link */}
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
+          <div className="text-center mt-4 space-y-2">
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Already have an account?{" "}
-              <Link to="/student/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link to="/student/login" className="font-medium" style={{ color: "var(--primary-color)" }}>
                 Sign in
+              </Link>
+            </p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              <Link to="/home" className="font-medium hover:underline" style={{ color: "var(--text-muted)" }}>
+                ← Back to Home
               </Link>
             </p>
           </div>

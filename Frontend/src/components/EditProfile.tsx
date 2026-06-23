@@ -70,14 +70,28 @@ export const EditProfile: React.FC<EditProfileProps> = ({ user, onProfileUpdate,
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      style={{ background: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(8px)" }}
+    >
+      <div
+        className="w-full max-w-md mx-4 p-6"
+        style={{
+          background: "var(--bg-secondary)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-lg)",
+        }}
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
+          <h2 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>Edit Profile</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="p-1 rounded-lg transition-colors bg-transparent border-none shadow-none"
+            style={{ color: "var(--text-muted)" }}
+            onMouseOver={(e) => { e.currentTarget.style.color = "var(--text-primary)"; }}
+            onMouseOut={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -89,11 +103,11 @@ export const EditProfile: React.FC<EditProfileProps> = ({ user, onProfileUpdate,
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-name" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
               Full Name
             </label>
             <input
-              id="name"
+              id="edit-name"
               name="name"
               type="text"
               required
@@ -106,11 +120,11 @@ export const EditProfile: React.FC<EditProfileProps> = ({ user, onProfileUpdate,
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-email" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
               Email Address
             </label>
             <input
-              id="email"
+              id="edit-email"
               name="email"
               type="email"
               required
@@ -123,11 +137,11 @@ export const EditProfile: React.FC<EditProfileProps> = ({ user, onProfileUpdate,
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-password" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
               New Password (optional)
             </label>
             <input
-              id="password"
+              id="edit-password"
               name="password"
               type="password"
               value={formData.password}
@@ -139,11 +153,11 @@ export const EditProfile: React.FC<EditProfileProps> = ({ user, onProfileUpdate,
 
           {/* Confirm Password */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="edit-confirmPassword" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
               Confirm New Password
             </label>
             <input
-              id="confirmPassword"
+              id="edit-confirmPassword"
               name="confirmPassword"
               type="password"
               value={formData.confirmPassword}
@@ -181,7 +195,7 @@ export const EditProfile: React.FC<EditProfileProps> = ({ user, onProfileUpdate,
             >
               {loading ? (
                 <>
-                  <div className="spinner mr-2"></div>
+                  <div className="spinner mr-2" style={{ width: 20, height: 20 }}></div>
                   Updating...
                 </>
               ) : (

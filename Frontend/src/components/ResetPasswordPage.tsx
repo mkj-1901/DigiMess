@@ -53,18 +53,29 @@ export const ResetPasswordPage: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen w-screen flex items-center justify-center animate-fade-in">
-        <div className="w-full max-w-md card p-8 animate-slide-in">
+      <div
+        className="min-h-screen w-screen flex items-center justify-center animate-fade-in"
+        style={{ background: "var(--bg-primary)" }}
+      >
+        <div
+          className="w-full max-w-md p-8 animate-slide-in"
+          style={{
+            background: "var(--bg-surface)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "var(--radius-xl)",
+          }}
+        >
           <div className="text-center">
             <div className="mb-4">
-              <svg className="mx-auto h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--success-color)" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
               Password Reset Successful
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="mb-6" style={{ color: "var(--text-secondary)" }}>
               Your password has been successfully reset. You can now log in with your new password.
             </p>
             <Link to="/" className="btn-primary w-full flex items-center justify-center">
@@ -80,19 +91,36 @@ export const ResetPasswordPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center animate-fade-in">
-      <div className="w-full max-w-md card p-8 animate-slide-in">
+    <div
+      className="min-h-screen w-screen flex items-center justify-center animate-fade-in relative overflow-hidden"
+      style={{ background: "var(--bg-primary)" }}
+    >
+      {/* Background orb */}
+      <div
+        className="absolute top-1/3 left-1/3 w-64 h-64 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(129,140,248,0.1) 0%, transparent 70%)" }}
+      />
+
+      <div
+        className="w-full max-w-md p-8 animate-slide-in relative z-10"
+        style={{
+          background: "var(--bg-surface)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "var(--radius-xl)",
+        }}
+      >
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mb-4">
-            <svg className="mx-auto h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--primary-color)" }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
             Reset Your Password
           </h2>
-          <p className="text-gray-600">Enter your new password below</p>
+          <p style={{ color: "var(--text-secondary)" }}>Enter your new password below</p>
         </div>
 
         {/* Form */}
@@ -100,7 +128,7 @@ export const ResetPasswordPage: React.FC = () => {
           <div className="space-y-4">
             {/* New Password */}
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="newPassword" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
                 New Password
               </label>
               <input
@@ -117,7 +145,7 @@ export const ResetPasswordPage: React.FC = () => {
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
                 Confirm New Password
               </label>
               <input
@@ -154,7 +182,7 @@ export const ResetPasswordPage: React.FC = () => {
             >
               {loading ? (
                 <>
-                  <div className="spinner mr-2"></div>
+                  <div className="spinner mr-2" style={{ width: 20, height: 20 }}></div>
                   Resetting Password...
                 </>
               ) : (
@@ -170,7 +198,7 @@ export const ResetPasswordPage: React.FC = () => {
 
           {/* Back to Login */}
           <div className="text-center">
-            <Link to="/" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">
+            <Link to="/" className="text-sm transition-colors" style={{ color: "var(--primary-color)" }}>
               Back to Login
             </Link>
           </div>

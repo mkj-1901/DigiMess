@@ -1,4 +1,9 @@
 require('dotenv').config();
+
+// Suppress ONNX Runtime C++ warnings before any imports
+process.env.ORT_LOG_SEVERITY_LEVEL = '4';
+process.env.ORT_LOG_LEVEL = 'fatal';
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');

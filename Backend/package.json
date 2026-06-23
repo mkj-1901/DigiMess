@@ -4,8 +4,8 @@
   "description": "Backend API for DigiMess — a comprehensive mess management system",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
+    "dev": "nodemon start.js",
+    "start": "node start.js"
   },
   "engines": {
     "node": ">=18.0.0"

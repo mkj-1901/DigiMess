@@ -46,14 +46,37 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+    <div
+      className="min-h-screen w-screen flex items-center justify-center animate-fade-in relative overflow-hidden"
+      style={{ background: "var(--bg-primary)" }}
+    >
+      {/* Background orbs */}
+      <div
+        className="absolute top-1/4 right-1/3 w-72 h-72 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(129,140,248,0.1) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute bottom-1/4 left-1/3 w-56 h-56 rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(244,114,182,0.08) 0%, transparent 70%)" }}
+      />
+
+      <div
+        className="w-full max-w-md p-8 animate-slide-in relative z-10"
+        style={{
+          background: "var(--bg-surface)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid var(--border-color)",
+          borderRadius: "var(--radius-xl)",
+        }}
+      >
         {/* Header */}
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-extrabold text-gray-900">
-            Student Login to DigiMess
+          <h2 className="text-3xl font-extrabold" style={{ color: "var(--text-primary)" }}>
+            Student Login
           </h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to your student account</p>
+          <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Sign in to your student account
+          </p>
         </div>
 
         {/* Form */}
@@ -61,36 +84,32 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
           <div className="space-y-4">
             {/* Email */}
             <input
-              id="email"
+              id="student-email"
               name="email"
               type="email"
               required
               placeholder="Email address"
               value={credentials.email}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                        placeholder-gray-400 text-gray-900 focus:outline-none 
-                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="form-input"
             />
 
             <input
-              id="password"
+              id="student-password"
               name="password"
               type="password"
               required
               placeholder="Password"
               value={credentials.password}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md 
-                        placeholder-gray-400 text-gray-900 focus:outline-none 
-                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="form-input"
             />
           </div>
 
           {/* Error */}
           {error && (
-            <div className="rounded-md bg-red-50 p-3 text-center">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="error-message text-center">
+              <p className="text-sm">{error}</p>
             </div>
           )}
 
@@ -107,9 +126,9 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
 
           {/* Divider */}
           <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow" style={{ borderTop: "1px solid var(--border-color)" }}></div>
+            <span className="flex-shrink mx-4 text-sm" style={{ color: "var(--text-muted)" }}>or</span>
+            <div className="flex-grow" style={{ borderTop: "1px solid var(--border-color)" }}></div>
           </div>
 
           {/* Google Login Button */}
@@ -139,21 +158,17 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
             />
           </div>
 
-          {/* Demo Credentials */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              Demo credentials:
-              <br />
-              Student: <b>student@digimess.com</b> / <b>student123</b>
-            </p>
-          </div>
-
           {/* Signup Link */}
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
+          <div className="text-center mt-4 space-y-2">
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Don't have an account?{" "}
-              <Link to="/student/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link to="/student/signup" className="font-medium" style={{ color: "var(--primary-color)" }}>
                 Sign up
+              </Link>
+            </p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              <Link to="/home" className="font-medium hover:underline" style={{ color: "var(--text-muted)" }}>
+                ← Back to Home
               </Link>
             </p>
           </div>

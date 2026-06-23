@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import type {
   User,
@@ -118,6 +118,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
 
   const today = new Date().toISOString().split("T")[0];
 
+  // Compute tomorrow's date for opt-out minimum date constraint
+  const tomorrowDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split("T")[0];
+  })();
+
   // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
@@ -129,7 +136,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
           reviewService.getReviews(user.id),
           optoutService.getOptOuts(user.id),
         ]);
-        if (historyRes.success) setAttendanceHistory(historyRes.history);
+        if (historyRes.success) {
+          setAttendanceHistory(historyRes.history);
+          const todayRecord = historyRes.history.find(
+            (h: any) => new Date(h.date).toISOString().split("T")[0] === today
+          );
+          if (todayRecord) {
+            setMealForm({
+              breakfast: todayRecord.breakfast || false,
+              lunch: todayRecord.lunch || false,
+              dinner: todayRecord.dinner || false
+            });
+          }
+        }
         if (rebatesRes.success) setRebates(rebatesRes.rebates);
         if (reviewsRes.success) setReviews(reviewsRes.reviews);
         if (optOutsRes.success) setOptOuts(optOutsRes.optOuts);
@@ -152,8 +171,19 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
       const res = await mealService.logAttendance({ date: today, ...mealForm });
       if (res.success) {
         const historyRes = await mealService.getHistory(user.id);
-        if (historyRes.success) setAttendanceHistory(historyRes.history);
-        setMealForm({ breakfast: false, lunch: false, dinner: false });
+        if (historyRes.success) {
+          setAttendanceHistory(historyRes.history);
+          const todayRecord = historyRes.history.find(
+            (h: any) => new Date(h.date).toISOString().split("T")[0] === today
+          );
+          if (todayRecord) {
+            setMealForm({
+              breakfast: todayRecord.breakfast || false,
+              lunch: todayRecord.lunch || false,
+              dinner: todayRecord.dinner || false
+            });
+          }
+        }
       }
     } catch (err) {
       setError("Failed to log attendance");
@@ -196,6 +226,15 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
 
   const submitOptOut = async () => {
     try {
+      // Validate that start date is at least tomorrow
+      if (optOutForm.startDate && optOutForm.startDate <= today) {
+        setError("Opt-out start date must be from tomorrow onwards. You cannot opt out for today or past dates.");
+        return;
+      }
+      if (optOutForm.endDate && optOutForm.endDate <= today) {
+        setError("Opt-out end date must be from tomorrow onwards.");
+        return;
+      }
       setOptOutLoading(true);
       const res = await optoutService.submitOptOut(optOutForm);
       if (res.success) {
@@ -203,8 +242,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
         if (optOutsRes.success) setOptOuts(optOutsRes.optOuts);
         setOptOutForm({ startDate: "", endDate: "", reason: "" });
       }
-    } catch (err) {
-      setError("Failed to submit opt-out request");
+    } catch (err: any) {
+      setError(err.message || "Failed to submit opt-out request");
     } finally {
       setOptOutLoading(false);
     }
@@ -425,7 +464,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 </div>
                 <DarkTable
                   headers={["Date", "Meals", "Total"]}
-                  rows={attendanceHistory.slice(-5).reverse().map((att) => [
+                  rows={attendanceHistory.slice(0, 5).map((att) => [
                     new Date(att.date).toLocaleDateString(),
                     <div className="flex space-x-1.5">
                       {att.breakfast && <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: "rgba(251,146,60,0.15)", color: "#fb923c" }}>B</span>}
@@ -473,7 +512,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Attendance History</h3>
                 <DarkTable
                   headers={["Date", "Meals", "Total"]}
-                  rows={attendanceHistory.slice(-10).reverse().map((att) => [
+                  rows={attendanceHistory.slice(0, 10).map((att) => [
                     new Date(att.date).toLocaleDateString(),
                     <div className="flex space-x-1.5">
                       {att.breakfast && <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: "rgba(251,146,60,0.15)", color: "#fb923c" }}>B</span>}
@@ -523,7 +562,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Your Past Reviews</h3>
                 <DarkTable
                   headers={["Date", "Rating", "Comment"]}
-                  rows={reviews.slice(-10).reverse().map((rev) => [
+                  rows={reviews.slice(0, 10).map((rev) => [
                     new Date(rev.mealDate).toLocaleDateString(),
                     <div className="flex items-center">
                       {Array.from({ length: 5 }, (_, i) => i < rev.rating ? <SolidStarIcon key={i} className="w-4 h-4 text-yellow-400" /> : <HollowStarIcon key={i} className="w-4 h-4" style={{ color: "var(--text-muted)" }} />)}
@@ -545,11 +584,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Start Date</label>
-                    <input type="date" name="startDate" value={optOutForm.startDate} onChange={handleOptOutChange} min={today} className="form-input" />
+                    <input type="date" name="startDate" value={optOutForm.startDate} onChange={handleOptOutChange} min={tomorrowDate} className="form-input" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>End Date</label>
-                    <input type="date" name="endDate" value={optOutForm.endDate} onChange={handleOptOutChange} min={optOutForm.startDate || today} className="form-input" />
+                    <input type="date" name="endDate" value={optOutForm.endDate} onChange={handleOptOutChange} min={optOutForm.startDate || tomorrowDate} className="form-input" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Reason</label>
@@ -565,7 +604,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Opt-Out History</h3>
                 <DarkTable
                   headers={["Start", "End", "Reason", "Status"]}
-                  rows={optOuts.slice(-10).reverse().map((opt) => [
+                  rows={optOuts.slice(0, 10).map((opt) => [
                     new Date(opt.startDate).toLocaleDateString(),
                     new Date(opt.endDate).toLocaleDateString(),
                     opt.reason,
@@ -620,7 +659,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ user, onLogout }) =
                 <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Rebate History</h3>
                 <DarkTable
                   headers={["Month", "Amount", "Status"]}
-                  rows={rebates.slice(-10).reverse().map((reb) => [
+                  rows={rebates.slice(0, 10).map((reb) => [
                     reb.monthYear,
                     <span style={{ color: "var(--success-color)", fontWeight: 600 }}>₹{reb.calculatedAmount}</span>,
                     <span className="px-2.5 py-1 rounded-full text-xs font-medium" style={{ background: reb.status === "approved" ? "rgba(52,211,153,0.15)" : reb.status === "pending" ? "rgba(251,191,36,0.15)" : "rgba(248,113,113,0.15)", color: reb.status === "approved" ? "var(--success-color)" : reb.status === "pending" ? "var(--warning-color)" : "var(--error-color)" }}>{reb.status}</span>,

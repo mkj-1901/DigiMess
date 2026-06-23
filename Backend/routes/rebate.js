@@ -1,13 +1,14 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Rebate = require('../models/Rebate');
 const MealAttendance = require('../models/MealAttendance');
 const OptOut = require('../models/OptOut');
-const { verifyToken, roleCheck } = require('../middleware/authMiddleware');
+const { roleCheck } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // Calculate rebate for a user and month (student/admin)
-router.get('/:userId/calculate', verifyToken, async (req, res) => {
+router.get('/:userId/calculate', async (req, res) => {
   try {
     const { userId } = req.params;
     const { monthYear } = req.query; // e.g., '2024-01'
@@ -30,7 +31,7 @@ router.get('/:userId/calculate', verifyToken, async (req, res) => {
     // Get attended days: count unique dates with totalMeals > 0
     const attendedAggregation = await MealAttendance.aggregate([
       { $match: { 
-        user: userId, 
+        user: new mongoose.Types.ObjectId(userId), 
         date: { $gte: startOfMonth, $lte: endOfMonth },
         totalMeals: { $gt: 0 }
       }},
@@ -87,7 +88,7 @@ router.get('/:userId/calculate', verifyToken, async (req, res) => {
 });
 
 // Approve rebate (admin only)
-router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) => {
+router.put('/:id/approve', roleCheck(['admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notes } = req.body; // status: 'approved', 'rejected'; notes optional
@@ -115,7 +116,7 @@ router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) =
 });
 
 // Get user's rebate history
-router.get('/:userId', verifyToken, async (req, res) => {
+router.get('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 

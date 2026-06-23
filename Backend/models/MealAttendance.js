@@ -26,7 +26,7 @@ const mealAttendanceSchema = new mongoose.Schema({
     type: Number,
     default: 0
   }
-});
+}, { timestamps: true });
 
 // Pre-save hook to compute totalMeals
 mealAttendanceSchema.pre('save', function(next) {

@@ -2,6 +2,8 @@
 
 A comprehensive web-based Mess Management System for students and administrators. DigiMess streamlines mess operations including meal attendance tracking, opt-out requests, rebate calculations, and review management with ML-powered sentiment analysis.
 
+**Live Deployed URL:** [https://digimess1901.vercel.app](https://digimess1901.vercel.app)
+
 ---
 
 ## 🏗️ Tech Stack
@@ -11,7 +13,7 @@ A comprehensive web-based Mess Management System for students and administrators
 | Frontend   | React 19, TypeScript, Tailwind CSS 4, Vite 7    |
 | Backend    | Node.js, Express 5, JWT Authentication           |
 | Database   | MongoDB / Mongoose                               |
-| ML         | Keyword-based sentiment analysis (custom)        |
+| ML         | ONNX Runtime Node (`@xenova/transformers`) with DistilBART & DistilBERT |
 | Email      | Nodemailer (Gmail SMTP)                          |
 
 ---
@@ -43,7 +45,8 @@ DigiMess/
 │   ├── .env.example               # Environment variable template
 │   ├── Procfile                   # Deployment process file
 │   ├── package.json
-│   ├── seed.js                    # Database seeder with sample data
+│   ├── seed/
+│   │   └── autoSeed.js            # Database auto-seeder with sample data
 │   └── server.js                  # Express server entry point
 │
 ├── Frontend/
@@ -53,6 +56,7 @@ DigiMess/
 │   │   │   ├── AdminDashboard.tsx      # Admin panel with stats & management
 │   │   │   ├── EditProfile.tsx         # User profile editor
 │   │   │   ├── ForgotPasswordPage.tsx  # Password reset request
+│   │   │   ├── LandingPage.tsx         # Modern interactive landing page
 │   │   │   ├── LoginPage.tsx           # Admin login page
 │   │   │   ├── ResetPasswordPage.tsx   # Password reset form
 │   │   │   ├── StudentDashboard.tsx    # Student panel with all features
@@ -126,7 +130,6 @@ JWT_SECRET=your_super_secret_jwt_key_here
 PORT=5000
 EMAIL_USER=your-gmail@gmail.com
 EMAIL_PASS=your-16-digit-app-password
-FRONTEND_URL=http://localhost:5173
 GOOGLE_CLIENT_ID=your_google_client_id_here
 ```
 
@@ -257,12 +260,12 @@ All endpoints are prefixed with `/api`. Protected routes require a `Bearer` toke
 
 ## 🧠 ML — Review Summarization
 
-The backend includes a keyword-based sentiment analysis engine (`Backend/ml/summarizer.js`) that:
+The backend includes a local, high-performance Transformer-based Natural Language Processing (NLP) pipeline (`Backend/ml/summarizer.js`) that:
 
-1. Analyzes review comments for positive, negative, and neutral keywords
-2. Determines dominant sentiment with emoji indicators (🟢 🟡 🔴)
-3. Extracts top frequent words for dynamic summaries
-4. Computes average ratings across reviews
+1. **Abstractive Summarization**: Utilizes the HuggingFace `Xenova/distilbart-cnn-6-6` model running locally via ONNX Runtime to synthesize user feedback into concise, meaningful summaries.
+2. **Sentiment Analysis**: Employs the `Xenova/distilbert-base-uncased-finetuned-sst-2-english` model to identify positive, negative, and neutral sentiments with dynamic emoji indicators (🟢 🟡 🔴).
+3. **Advanced Safeguards**: Prevents repetition looping, cleans up sentence cutoffs, and runs dynamically on cache-optimized CPU pipelines.
+4. **Calculates Average Ratings**: Computes precise feedback average ratings.
 
 Admins can view the AI-generated summary via the dashboard or the `/api/admin/reviews/summary` endpoint.
 

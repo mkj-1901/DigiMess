@@ -1,16 +1,26 @@
 const express = require('express');
 const OptOut = require('../models/OptOut');
-const { verifyToken, roleCheck } = require('../middleware/authMiddleware');
+const { roleCheck } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // Submit opt-out request (student only)
-router.post('/request', verifyToken, roleCheck(['student']), async (req, res) => {
+router.post('/request', roleCheck(['student']), async (req, res) => {
   try {
     const { startDate, endDate, reason } = req.body;
 
     if (!startDate || !endDate || !reason) {
       return res.status(400).json({ success: false, message: 'Start date, end date, and reason are required' });
+    }
+
+    // Ensure opt-out dates are from tomorrow onwards (can't opt out for today or past)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const tomorrowStart = new Date(todayStart);
+    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+    if (new Date(startDate) < tomorrowStart) {
+      return res.status(400).json({ success: false, message: 'Opt-out start date must be from tomorrow onwards. You cannot opt out for today or past dates.' });
     }
 
     if (new Date(startDate) >= new Date(endDate)) {
@@ -38,7 +48,7 @@ router.post('/request', verifyToken, roleCheck(['student']), async (req, res) =>
 });
 
 // Approve/reject opt-out (admin only)
-router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) => {
+router.put('/:id/approve', roleCheck(['admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { approved, adminNotes } = req.body;
@@ -64,7 +74,7 @@ router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) =
 });
 
 // Get user's opt-outs
-router.get('/:userId', verifyToken, async (req, res) => {
+router.get('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 

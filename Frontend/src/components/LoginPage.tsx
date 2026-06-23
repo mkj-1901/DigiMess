@@ -207,7 +207,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               </Link>
             </p>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              <Link to="/home" className="font-medium transition-colors hover:underline" style={{ color: "var(--text-muted)" }}>
+              <Link to="/" className="font-medium transition-colors hover:underline" style={{ color: "var(--text-muted)" }}>
                 ← Back to Home
               </Link>
             </p>

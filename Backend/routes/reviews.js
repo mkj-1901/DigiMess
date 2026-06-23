@@ -1,11 +1,11 @@
 const express = require('express');
 const Review = require('../models/Review');
-const { verifyToken, roleCheck } = require('../middleware/authMiddleware');
+const { roleCheck } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 // Submit review (student only)
-router.post('/submit', verifyToken, roleCheck(['student']), async (req, res) => {
+router.post('/submit', roleCheck(['student']), async (req, res) => {
   try {
     const { mealDate, rating, comment } = req.body;
 
@@ -38,7 +38,7 @@ router.post('/submit', verifyToken, roleCheck(['student']), async (req, res) => 
 });
 
 // Approve/reject review (admin only)
-router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) => {
+router.put('/:id/approve', roleCheck(['admin']), async (req, res) => {
   try {
     const { id } = req.params;
     const { approved } = req.body;
@@ -61,7 +61,7 @@ router.put('/:id/approve', verifyToken, roleCheck(['admin']), async (req, res) =
 });
 
 // Get user's reviews
-router.get('/:userId', verifyToken, async (req, res) => {
+router.get('/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
 

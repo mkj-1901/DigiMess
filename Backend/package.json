@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "engines": {
     "node": ">=18.0.0"

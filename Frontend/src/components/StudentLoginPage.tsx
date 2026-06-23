@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { authService } from "../services/authService";
 import type { LoginCredentials } from "../types/User";
@@ -15,7 +15,6 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -167,7 +166,7 @@ export const StudentLoginPage: React.FC<StudentLoginPageProps> = ({ onLogin }) =
               </Link>
             </p>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              <Link to="/home" className="font-medium hover:underline" style={{ color: "var(--text-muted)" }}>
+              <Link to="/" className="font-medium hover:underline" style={{ color: "var(--text-muted)" }}>
                 ← Back to Home
               </Link>
             </p>

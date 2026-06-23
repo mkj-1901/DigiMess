@@ -13,24 +13,29 @@ router.post('/request', roleCheck(['student']), async (req, res) => {
       return res.status(400).json({ success: false, message: 'Start date, end date, and reason are required' });
     }
 
-    // Ensure opt-out dates are from tomorrow onwards (can't opt out for today or past)
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const tomorrowStart = new Date(todayStart);
-    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    // Parse dates as UTC to avoid timezone mismatches with the client
+    const parsedStart = new Date(startDate + 'T00:00:00Z');
+    const parsedEnd = new Date(endDate + 'T00:00:00Z');
 
-    if (new Date(startDate) < tomorrowStart) {
+    // Ensure opt-out dates are from tomorrow onwards (can't opt out for today or past)
+    const now = new Date();
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const tomorrowUTC = new Date(todayUTC);
+    tomorrowUTC.setUTCDate(tomorrowUTC.getUTCDate() + 1);
+
+    if (parsedStart < tomorrowUTC) {
       return res.status(400).json({ success: false, message: 'Opt-out start date must be from tomorrow onwards. You cannot opt out for today or past dates.' });
     }
 
-    if (new Date(startDate) >= new Date(endDate)) {
-      return res.status(400).json({ success: false, message: 'Start date must be before end date' });
+    // Allow single-day opt-outs (startDate === endDate)
+    if (parsedStart > parsedEnd) {
+      return res.status(400).json({ success: false, message: 'Start date must be before or equal to end date' });
     }
 
     const optOut = new OptOut({
       user: req.user.id,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: parsedStart,
+      endDate: parsedEnd,
       reason
     });
 

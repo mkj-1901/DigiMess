@@ -80,6 +80,14 @@ export const StudentSignupPage: React.FC<StudentSignupPageProps> = ({ onLogin })
       >
         {/* Header */}
         <div className="text-center mb-6">
+          <div className="mb-4 flex justify-center">
+            <img
+              src="/favicon.svg"
+              alt="DigiMess Logo"
+              className="w-14 h-14 shrink-0"
+              style={{ filter: "drop-shadow(0 4px 12px rgba(129,140,248,0.4))" }}
+            />
+          </div>
           <h2 className="text-3xl font-extrabold" style={{ color: "var(--text-primary)" }}>
             Create Account
           </h2>

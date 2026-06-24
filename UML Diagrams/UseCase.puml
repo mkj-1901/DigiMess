@@ -1,4 +1,4 @@
-@startuml
+@startuml UseCase_Diagram
 !define RECTANGLE class
 
 left to right direction
@@ -9,43 +9,38 @@ actor Admin
 
 rectangle "DigiMess System" {
 
-    usecase "Login / Authentication" as UC_Login
-    usecase "View Meals" as UC_ViewMeals
-    usecase "Opt-Out Meal" as UC_OptOut
+    usecase "Authentication (Email/Google)" as UC_Auth
+    usecase "Log Meal Attendance" as UC_Attendance
+    usecase "Request Opt-Out" as UC_OptOut
     usecase "Submit Meal Review" as UC_Review
-    usecase "View Rebate" as UC_ViewRebate
-    usecase "Receive Notification" as UC_Notification
+    usecase "View Rebate Status" as UC_ViewRebate
+    usecase "Manage Profile" as UC_Profile
 
-    usecase "Manage Attendance" as UC_ManageAttendance
-    usecase "Approve Rebates" as UC_ApproveRebate
-    usecase "Manage Special Dinners" as UC_ManageDinner
-    usecase "View Reports & Analytics" as UC_Reports
-    usecase "Monitor Food Wastage" as UC_FoodWastage
-    usecase "Analyze Sentiment" as UC_Sentiment
+    usecase "View Dashboard Stats" as UC_Stats
+    usecase "Review Opt-Out Requests" as UC_ReviewOptOut
+    usecase "Calculate & Approve Rebates" as UC_ApproveRebate
+    usecase "View All Reviews" as UC_ViewReviews
+    usecase "Generate ML Review Summary" as UC_MLSummary
+    usecase "View Attendance History" as UC_ViewAttendance
 
 }
 
-Student --> UC_Login
-Student --> UC_ViewMeals
+Student --> UC_Auth
+Student --> UC_Attendance
 Student --> UC_OptOut
 Student --> UC_Review
 Student --> UC_ViewRebate
-Student --> UC_Notification
+Student --> UC_Profile
 
-Admin --> UC_Login
-Admin --> UC_ManageAttendance
+Admin --> UC_Auth
+Admin --> UC_Stats
+Admin --> UC_ReviewOptOut
 Admin --> UC_ApproveRebate
-Admin --> UC_ManageDinner
-Admin --> UC_Reports
-Admin --> UC_FoodWastage
-Admin --> UC_Sentiment
+Admin --> UC_ViewReviews
+Admin --> UC_MLSummary
+Admin --> UC_ViewAttendance
 
-UC_OptOut ..> UC_ViewMeals : <<include>>
-UC_ApproveRebate ..> UC_ManageAttendance : <<include>>
-UC_Sentiment ..> UC_Review : <<include>>
-
-UC_Notification ..> UC_OptOut : <<extend>>
-UC_Notification ..> UC_ApproveRebate : <<extend>>
-UC_Notification ..> UC_ManageDinner : <<extend>>
+UC_MLSummary ..> UC_ViewReviews : <<extend>>
+UC_ApproveRebate ..> UC_ViewAttendance : <<include>>
 
 @enduml

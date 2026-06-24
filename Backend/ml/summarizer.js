@@ -12,6 +12,9 @@ async function initTransformers() {
     
     // Silence onnxruntime-node graph optimization warnings
     transformers.env.backends.onnx.logLevel = 'fatal';
+    
+    // Set cache directory to /tmp for Vercel/Serverless compatibility
+    transformers.env.cacheDir = '/tmp';
   }
 }
 

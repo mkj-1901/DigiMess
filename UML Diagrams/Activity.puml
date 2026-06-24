@@ -1,43 +1,59 @@
-@startuml
+@startuml Activity_Diagram
 |Student|
 start
-
-:Login;
+:Login (Email/Pass or Google OAuth);
 :View Dashboard;
 
 partition "Student Actions" {
-    if ("Opt-out of meal?") then (Yes)
-        :Submit opt-out request;
-        -> Admin;
+    if ("Log Attendance?") then (Yes)
+        :Select Meals (Breakfast/Lunch/Dinner);
+        :Submit Attendance;
     else (No)
-        :Proceed with meal;
+    endif
+
+    if ("Opt-out of meals?") then (Yes)
+        :Select Dates & Provide Reason;
+        :Submit opt-out request;
+        |Admin|
+        :Review Request;
+        if ("Approved?") then (Yes)
+            :Mark as Approved;
+        else (No)
+            :Mark as Rejected;
+        endif
+        |Student|
+    else (No)
     endif
 
     if ("Submit review?") then (Yes)
-        :Write and submit review;
-        :System performs sentiment analysis;
-        -> Admin;
+        :Write review and rate meal;
+        :Submit review;
     else (No)
-        :Skip review;
     endif
 
-    :Check rebate summary;
+    if ("End of Month?") then (Yes)
+        :Check rebate calculation;
+    else (No)
+    endif
 }
 
 |Admin|
 partition "Admin Actions" {
     :Login to Admin Panel;
-    :View opt-out requests;
-    :Calculate rebates;
-    :View sentiment analysis of reviews;
-
-    if ("Special dinner planned?") then (Yes)
-        :Update menu and notify students;
+    :View System Stats & Dashboard;
+    :Review pending opt-out requests;
+    :Calculate & approve monthly rebates;
+    :View recent attendance;
+    
+    if ("Generate Insights?") then (Yes)
+        :Request Review Summary;
+        |ML Service|
+        :Run DistilBART Summarizer;
+        :Run DistilBERT Sentiment Analysis;
+        |Admin|
+        :View AI Summary & Sentiment;
     else (No)
-        :Continue with regular meals;
     endif
-
-    :Generate reports (attendance, wastage, rebates);
 }
 
 stop

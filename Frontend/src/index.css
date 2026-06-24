@@ -4,7 +4,7 @@
    DigiMess Dark Mode Design System
    ============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Google Fonts Inter is loaded non-blocking via index.html */
 
 :root {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -379,4 +379,48 @@ button:disabled {
 }
 .glow-border:hover::after {
   opacity: 1;
+}
+
+/* === Performance Optimizations === */
+
+/* Promote animated elements to their own compositing layer */
+.animate-float,
+.animate-fade-in,
+.animate-slide-in,
+.animate-slide-up {
+  will-change: transform, opacity;
+}
+
+/* Use content-visibility for off-screen sections to skip rendering */
+section[id] {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
+/* === Marquee Animation === */
+.marquee-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  display: flex;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-content {
+  display: flex;
+  animation: marquee 25s linear infinite;
+  width: max-content;
+}
+
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

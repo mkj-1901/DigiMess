@@ -530,41 +530,59 @@ style = {{
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4">
-            {[
-              { name: "React 19", color: "#61dafb" },
-              { name: "TypeScript", color: "#3178c6" },
-              { name: "Vite", color: "#646cff" },
-              { name: "Tailwind CSS", color: "#38bdf8" },
-              { name: "Node.js", color: "#68a063" },
-              { name: "Express", color: "#a78bfa" },
-              { name: "MongoDB", color: "#4db33d" },
-              { name: "JWT Auth", color: "#f472b6" },
-              { name: "Nodemailer", color: "#fbbf24" },
-              { name: "ML Engine", color: "#818cf8" },
-            ].map((tech) => (
-              <div
-                key={tech.name}
-                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
-                style={{
-                  background: `${tech.color}15`,
-                  border: `1px solid ${tech.color}30`,
-                  color: tech.color,
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = `${tech.color}25`;
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = `0 4px 15px ${tech.color}20`;
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = `${tech.color}15`;
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                {tech.name}
-              </div>
-            ))}
+          <div className="marquee-container marquee-mask pt-8 pb-12">
+            <div className="marquee-content gap-8 sm:gap-12 px-4 sm:px-6">
+              {/* Double array for seamless infinite scroll */}
+              {[...Array(2)].map((_, i) => (
+                <React.Fragment key={i}>
+                  {[
+                    { name: "React 19", color: "#61dafb", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" },
+                    { name: "TypeScript", color: "#3178c6", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" },
+                    { name: "Vite", color: "#646cff", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vitejs/vitejs-original.svg" },
+                    { name: "Tailwind CSS", color: "#38bdf8", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
+                    { name: "Node.js", color: "#68a063", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
+                    { name: "Express", color: "#ffffff", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original.svg", invert: true },
+                    { name: "MongoDB", color: "#4db33d", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
+                    { name: "JWT Auth", color: "#f472b6", icon: "https://jwt.io/img/pic_logo.svg" },
+                    { name: "Hugging Face", color: "#fbbf24", icon: "https://huggingface.co/front/assets/huggingface_logo-noborder.svg" },
+                  ].map((tech, index) => (
+                    <div
+                      key={`${i}-${index}`}
+                      className="flex flex-col items-center justify-center space-y-3 group cursor-default transition-transform duration-300"
+                      style={{ minWidth: "120px" }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = "translateY(-6px)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      <div 
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center p-3 transition-all duration-300 bg-opacity-10 backdrop-blur-sm"
+                        style={{
+                          background: `${tech.color}10`,
+                          border: `1px solid ${tech.color}25`,
+                          boxShadow: `0 4px 20px ${tech.color}15`
+                        }}
+                      >
+                        <img 
+                          src={tech.icon} 
+                          alt={tech.name} 
+                          className="w-full h-full object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-110"
+                          style={{ filter: tech.invert ? 'invert(1) brightness(2)' : 'none' }}
+                        />
+                      </div>
+                      <span 
+                        className="text-sm font-semibold transition-colors duration-300"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        {tech.name}
+                      </span>
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
       </section >

@@ -1,45 +1,57 @@
-@startuml
+@startuml Sequence_Diagram
 actor Student
 actor Admin
-participant "DigiMess System" as System
-database "Database" as DB
-participant "ML Service\n(Sentiment Analysis)" as ML
+participant "Frontend UI" as UI
+participant "Auth / API" as Auth
+participant "Backend Service" as System
+database "MongoDB" as DB
+participant "ML Engine\n(ONNX)" as ML
 
-Student -> System : Login
-System -> DB : Validate credentials
-DB --> System : Auth success
-System --> Student : Dashboard displayed
+Student -> UI : Click Login (Email or Google)
+UI -> Auth : Request Authentication
+Auth -> DB : Validate credentials / Google ID
+DB --> Auth : Auth Success
+Auth --> UI : JWT Access & Refresh Tokens
+UI --> Student : Show Dashboard
 
-Student -> System : Opt-out of meal
-System -> DB : Store opt-out request
-DB --> System : Confirmation
-System --> Student : Opt-out confirmed
+Student -> UI : Mark Attendance
+UI -> System : POST /api/meals/attendance
+System -> DB : Save MealAttendance record
+DB --> System : Success
+System --> UI : Attendance logged
 
-Student -> System : Submit review
-System -> DB : Save review
-System -> ML : Send review for sentiment analysis
-ML --> System : Sentiment result
-System -> DB : Store sentiment score
-System --> Student : Review submitted
+Student -> UI : Submit Opt-Out Request
+UI -> System : POST /api/optout/request
+System -> DB : Save OptOut record
+DB --> System : Success
+System --> UI : Opt-out requested
 
-Admin -> System : Login
-System -> DB : Validate credentials
-DB --> System : Auth success
-System --> Admin : Admin Dashboard displayed
+Student -> UI : Submit Review
+UI -> System : POST /api/reviews/submit
+System -> DB : Save Review record
+DB --> System : Success
+System --> UI : Review submitted
 
-Admin -> System : View opt-out requests
-System -> DB : Fetch opt-out data
-DB --> System : Return opt-out list
-System --> Admin : Show requests
+Admin -> UI : Request Reviews Summary
+UI -> System : GET /api/admin/reviews/summary
+System -> DB : Fetch all reviews
+DB --> System : Reviews data
+System -> ML : Summarize & Analyze Sentiment
+ML --> System : Summary text & Sentiment scores
+System --> UI : Summary Response
+UI --> Admin : Display AI insights
 
-Admin -> System : Calculate rebates
-System -> DB : Update rebate records
-DB --> System : Confirmation
-System --> Admin : Rebate summary generated
+Admin -> UI : Approve Opt-out
+UI -> System : PUT /api/optout/:id/approve
+System -> DB : Update OptOut status
+DB --> System : Success
+System --> UI : Opt-out Approved
 
-Admin -> System : View sentiment analysis
-System -> DB : Fetch aggregated review data
-DB --> System : Return sentiment results
-System --> Admin : Display analytics report
+Admin -> UI : View Rebates
+UI -> System : GET /api/admin/rebates
+System -> DB : Aggregate Rebate Data
+DB --> System : Rebates List
+System --> UI : Rebates Response
+UI --> Admin : Display Rebates
 
 @enduml

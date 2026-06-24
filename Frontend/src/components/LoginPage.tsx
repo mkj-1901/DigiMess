@@ -70,16 +70,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="mb-4">
-            <div
-              className="mx-auto w-14 h-14 rounded-xl flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, var(--primary-color), var(--accent-color))",
-                boxShadow: "0 4px 20px rgba(129, 140, 248, 0.3)",
-              }}
-            >
-              <span className="text-white text-2xl font-bold">D</span>
-            </div>
+          <div className="mb-4 flex justify-center">
+            <img
+              src="/favicon.svg"
+              alt="DigiMess Logo"
+              className="w-14 h-14 shrink-0"
+              style={{ filter: "drop-shadow(0 4px 12px rgba(129,140,248,0.4))" }}
+            />
           </div>
           <h2 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>
             Welcome to DigiMess

@@ -1,85 +1,103 @@
-@startuml
+@startuml Class_Diagram
 
-class Student {
-    - studentId : int
-    - name : string
-    - email : string
-    - password : string
-    - roomNo : string
-    - totalRebate : float
-    + login()
-    + viewMeals()
-    + optOutMeal(mealId : int)
-    + submitReview(mealId : int, comment : string, rating : int)
-    + viewRebate()
-    + receiveNotification(notification : Notification)
+class User {
+    - _id : ObjectId
+    - name : String
+    - email : String
+    - password : String
+    - role : String
+    - googleId : String
+    - avatar : String
+    + comparePassword(candidatePassword: String) : Boolean
 }
 
-class Meal {
-    - mealId : int
+class MealAttendance {
+    - _id : ObjectId
+    - user : ObjectId
     - date : Date
-    - mealType : string
-    - menu : string
-    + getMealDetails()
+    - breakfast : Boolean
+    - lunch : Boolean
+    - dinner : Boolean
+    - totalMeals : Number
+    + computeTotalMeals()
 }
 
 class OptOut {
-    - optOutId : int
-    - studentId : int
-    - mealId : int
-    - timestamp : DateTime
-    + recordOptOut()
+    - _id : ObjectId
+    - user : ObjectId
+    - startDate : Date
+    - endDate : Date
+    - reason : String
+    - approved : Boolean
+    - adminNotes : String
+}
+
+class Rebate {
+    - _id : ObjectId
+    - user : ObjectId
+    - monthYear : String
+    - baseFee : Number
+    - totalDays : Number
+    - attendedDays : Number
+    - optOutDays : Number
+    - missedDays : Number
+    - calculatedAmount : Number
+    - status : String
 }
 
 class Review {
-    - reviewId : int
-    - studentId : int
-    - mealId : int
-    - rating : int
-    - comment : string
-    - sentimentScore : float
-    - timestamp : DateTime
-    + analyzeSentiment()
+    - _id : ObjectId
+    - user : ObjectId
+    - mealDate : Date
+    - rating : Number
+    - comment : String
+    - approved : Boolean
 }
 
-class Admin {
-    - adminId : int
-    - name : string
-    - email : string
-    - password : string
+class ML_Summarizer {
+    + summarizeReviews(reviews: List<Review>) : Summary
+    + analyzeSentiment(comment: String) : SentimentScore
+}
+
+class AuthController {
     + login()
-    + approveRebate(optOutId : int)
-    + manageAttendance()
-    + manageSpecialDinner(dinnerId : int)
-    + viewReports()
-    + monitorFoodWastage()
-    + sendNotification(notification : Notification)
+    + googleLogin()
+    + register()
+    + forgotPassword()
+    + resetPassword()
+    + refresh()
 }
 
-class SpecialDinner {
-    - dinnerId : int
-    - date : Date
-    - menu : string
-    - capacity : int
-    + getDinnerDetails()
+class AdminController {
+    + getStats()
+    + getOptOuts()
+    + getRebates()
+    + getReviews()
+    + getReviewSummary()
+    + getAttendance()
 }
 
-class Notification {
-    - notificationId : int
-    - userId : int
-    - type : string
-    - message : string
-    - timestamp : DateTime
-    + send()
+class StudentController {
+    + logAttendance()
+    + requestOptOut()
+    + submitReview()
+    + viewHistory()
 }
 
-Student "1" -- "*" OptOut : opts_out
-Meal "1" -- "*" OptOut : skipped_in
-Student "1" -- "*" Review : submits
-Meal "1" -- "*" Review : reviewed
-Admin "1" -- "*" SpecialDinner : manages
-Student "1" -- "*" SpecialDinner : attends
-Admin "1" -- "*" Notification : sends
-Student "1" -- "*" Notification : receives
+User "1" *-- "*" MealAttendance
+User "1" *-- "*" OptOut
+User "1" *-- "*" Rebate
+User "1" *-- "*" Review
+
+AuthController --> User : authenticates
+AdminController --> OptOut : manages
+AdminController --> Rebate : calculates/approves
+AdminController --> Review : views/summarizes
+AdminController --> MealAttendance : views
+AdminController --> ML_Summarizer : calls
+
+StudentController --> MealAttendance : logs
+StudentController --> OptOut : requests
+StudentController --> Review : submits
 
 @enduml

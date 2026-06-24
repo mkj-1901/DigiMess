@@ -1,0 +1,95 @@
+@startuml ER_Diagram
+
+entity "User" as user {
+  * _id : ObjectId
+  --
+  name : String
+  email : String
+  password : String
+  role : String ["admin", "student"]
+  googleId : String
+  avatar : String
+  attendanceHistory : ObjectId[] <<MealAttendance>>
+  optOuts : ObjectId[] <<OptOut>>
+  rebates : ObjectId[] <<Rebate>>
+  reviews : ObjectId[] <<Review>>
+}
+
+entity "MealAttendance" as attendance {
+  * _id : ObjectId
+  --
+  user : ObjectId <<User>>
+  date : Date
+  breakfast : Boolean
+  lunch : Boolean
+  dinner : Boolean
+  totalMeals : Number
+  createdAt : Date
+  updatedAt : Date
+}
+
+entity "OptOut" as optout {
+  * _id : ObjectId
+  --
+  user : ObjectId <<User>>
+  startDate : Date
+  endDate : Date
+  reason : String
+  approved : Boolean
+  adminNotes : String
+  createdAt : Date
+}
+
+entity "Rebate" as rebate {
+  * _id : ObjectId
+  --
+  user : ObjectId <<User>>
+  monthYear : String
+  baseFee : Number
+  totalDays : Number
+  attendedDays : Number
+  optOutDays : Number
+  missedDays : Number
+  calculatedAmount : Number
+  status : String ["pending", "approved", "rejected", "paid"]
+  calculatedAt : Date
+  approvedAt : Date
+}
+
+entity "Review" as review {
+  * _id : ObjectId
+  --
+  user : ObjectId <<User>>
+  mealDate : Date
+  rating : Number
+  comment : String
+  approved : Boolean
+  createdAt : Date
+}
+
+entity "PasswordResetToken" as pwreset {
+  * _id : ObjectId
+  --
+  userId : ObjectId <<User>>
+  token : String
+  expiresAt : Date
+}
+
+entity "RefreshToken" as refreshtoken {
+  * _id : ObjectId
+  --
+  userId : ObjectId <<User>>
+  token : String
+  expiresAt : Date
+  createdAt : Date
+  updatedAt : Date
+}
+
+user ||--o{ attendance : has
+user ||--o{ optout : makes
+user ||--o{ rebate : has
+user ||--o{ review : submits
+user ||--o{ pwreset : generates
+user ||--o{ refreshtoken : uses
+
+@enduml
